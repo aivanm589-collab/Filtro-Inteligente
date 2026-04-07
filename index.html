@@ -1,0 +1,3473 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Filtro Inteligente">
+<meta name="application-name" content="Filtro Inteligente">
+<meta name="theme-color" content="#0c0e14">
+<meta name="description" content="Filtra tus viajes y pedidos al instante con inteligencia. Acepta solo los que valen la pena.">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Filtro Inteligente</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inconsolata:wght@300;400;500;600&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0c0e14;
+  --surface: #13161f;
+  --surface2: #1a1e2a;
+  --border: rgba(255,255,255,0.07);
+  --text: #eef2ff;
+  --muted: rgba(238,242,255,0.38);
+  --dim: rgba(238,242,255,0.12);
+  --green: #12f579;
+  --green-dim: rgba(18,245,121,0.12);
+  --yellow: #fbbf24;
+  --yellow-dim: rgba(251,191,36,0.12);
+  --red: #f94040;
+  --red-dim: rgba(249,64,64,0.12);
+  --accent: #4f7fff;
+  --accent-dim: rgba(79,127,255,0.14);
+}
+
+/* ── Light mode ── */
+[data-theme="light"] {
+  --bg: #f0f2f8;
+  --surface: #ffffff;
+  --surface2: #e8eaf2;
+  --border: rgba(0,0,0,0.08);
+  --text: #0d0f1a;
+  --muted: rgba(13,15,26,0.45);
+  --dim: rgba(13,15,26,0.08);
+  --green: #059652;
+  --green-dim: rgba(5,150,82,0.1);
+  --yellow: #d97706;
+  --yellow-dim: rgba(217,119,6,0.1);
+  --red: #dc2626;
+  --red-dim: rgba(220,38,38,0.08);
+  --accent: #2563eb;
+  --accent-dim: rgba(37,99,235,0.1);
+}
+[data-theme="light"] html,
+[data-theme="light"] body {
+  background: var(--bg);
+  margin: 0;
+  padding: 0;
+}
+@media (min-width: 500px) {
+  body { background: #e2e5f0; }
+}
+[data-theme="light"] .phone-shell {
+  border-color: rgba(0,0,0,0.12);
+  box-shadow: 0 0 0 6px #d4d8e8, 0 40px 80px rgba(0,0,0,0.15);
+}
+[data-theme="light"] .bottom-nav {
+  background: rgba(255,255,255,0.97);
+  border-top-color: rgba(0,0,0,0.08);
+}
+[data-theme="light"] .input-wrap {
+  background: #f5f6fa;
+  border-color: rgba(0,0,0,0.1);
+  color: var(--text);
+}
+[data-theme="light"] input {
+  color: var(--text);
+  background: transparent;
+}
+[data-theme="light"] .calc-header {
+  background: rgba(37,99,235,0.06);
+  border-color: rgba(37,99,235,0.15);
+}
+[data-theme="light"] .option-card {
+  background: var(--surface);
+  border-color: var(--border);
+}
+[data-theme="light"] .option-card.selected {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+[data-theme="light"] .vehicle-card {
+  background: var(--surface);
+  border-color: var(--border);
+}
+[data-theme="light"] .btn-secondary {
+  border-color: rgba(0,0,0,0.12);
+  color: var(--muted);
+}
+[data-theme="light"] .summary-card,
+[data-theme="light"] .kpi-box,
+[data-theme="light"] .history-summary {
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Syne', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  -webkit-text-size-adjust: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+@media (min-width: 500px) {
+  html, body {
+    align-items: center;
+    background: #e2e5f0;
+  }
+}
+
+/* ── Phone shell ── */
+.phone-shell {
+  width: 100%;
+  height: 100vh;
+  max-width: 480px;
+  background: var(--bg);
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+@media (min-width: 500px) {
+  .phone-shell {
+    width: 390px;
+    height: 844px;
+    border-radius: 50px;
+    border: 2px solid rgba(255,255,255,0.1);
+    box-shadow: 0 0 0 6px #0a0b0f, 0 40px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+}
+
+/* notch - only on desktop */
+.phone-shell::before {
+  content: '';
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 32px;
+  background: #0a0b0f;
+  border-radius: 20px;
+  z-index: 100;
+}
+@media (max-width: 499px) {
+  .phone-shell::before { display: none; }
+}
+
+.screen-wrap {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+/* ── Screens ── */
+.screen {
+  position: absolute;
+  inset: 0;
+  padding: 60px 24px 32px;
+  display: none;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(40px);
+  transition: opacity 0.32s ease, transform 0.32s cubic-bezier(0.22,1,0.36,1);
+  overflow-y: auto;
+}
+.screen.active {
+  display: flex;
+  opacity: 1;
+  pointer-events: all;
+  transform: translateX(0);
+}
+.screen.exit {
+  display: flex;
+  opacity: 0;
+  transform: translateX(-40px);
+  pointer-events: none;
+}
+
+/* ── Progress bar ── */
+.progress-bar {
+  display: flex;
+  gap: 5px;
+  padding: 0 24px;
+  padding-top: 52px;
+  flex-shrink: 0;
+}
+.progress-dot {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--dim);
+  transition: background 0.4s;
+}
+.progress-dot.done { background: var(--accent); }
+.progress-dot.active { background: var(--text); }
+
+/* ── Typography ── */
+.screen-label {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  font-family: 'Inconsolata', 'SF Mono', 'Monaco', monospace;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.screen-title {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.15;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.screen-sub {
+  font-size: 13px;
+  color: var(--muted);
+  font-family: 'Inconsolata', 'SF Mono', 'Monaco', monospace;
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+
+/* ── Option cards ── */
+.option-card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 18px;
+  padding: 18px 20px;
+  cursor: pointer;
+  transition: all 0.18s;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  -webkit-tap-highlight-color: transparent;
+}
+.option-card:active { transform: scale(0.98); }
+.option-card.selected {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.option-card .oc-icon {
+  font-size: 28px;
+  width: 44px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.option-card .oc-body { flex: 1; }
+.option-card .oc-title {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.option-card .oc-sub {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: 'Inconsolata', 'SF Mono', 'Monaco', monospace;
+  line-height: 1.4;
+}
+.option-card .oc-check {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--dim);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+  transition: all 0.18s;
+}
+.option-card.selected .oc-check {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* vehicle cards – compact grid */
+.vehicle-grid { display: flex; flex-direction: column; gap: 10px; }
+.vehicle-card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  padding: 15px 18px;
+  cursor: pointer;
+  transition: all 0.18s;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  -webkit-tap-highlight-color: transparent;
+}
+.vehicle-card:active { transform: scale(0.98); }
+.vehicle-card.selected {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+.vehicle-card .vc-icon { font-size: 26px; width: 36px; text-align: center; flex-shrink: 0; }
+.vehicle-card .vc-name { font-size: 16px; font-weight: 700; flex: 1; }
+.vehicle-card .vc-dot {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--dim);
+  transition: all 0.18s;
+  flex-shrink: 0;
+}
+.vehicle-card.selected .vc-dot { background: var(--accent); border-color: var(--accent); }
+
+/* ── Input fields ── */
+.input-group { margin-bottom: 14px; }
+.input-label {
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--text);
+  letter-spacing: 0.06em;
+  font-family: 'Syne', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  margin-bottom: 7px;
+  display: block;
+}
+.input-wrap {
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  padding: 15px 18px;
+  gap: 10px;
+  transition: border-color 0.18s;
+}
+.input-wrap:focus-within { border-color: rgba(79,127,255,0.5); }
+.input-prefix {
+  font-size: 20px;
+  color: var(--muted);
+  font-weight: 600;
+  font-family: 'Inconsolata', 'SF Mono', 'Monaco', monospace;
+}
+.input-wrap input {
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-size: 26px;
+  font-weight: 700;
+  font-family: 'Syne', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  width: 100%;
+}
+.input-wrap input::placeholder { color: rgba(238,242,255,0.15); }
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+/* ── Buttons ── */
+.btn-primary {
+  width: 100%;
+  padding: 20px;
+  border-radius: 16px;
+  border: none;
+  cursor: pointer;
+  background: var(--accent);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+  font-family: 'Syne', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  letter-spacing: 0.08em;
+  margin-top: auto;
+  transition: all 0.15s;
+  box-shadow: 0 8px 24px rgba(79,127,255,0.3);
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-primary:active { transform: scale(0.97); }
+.btn-primary:disabled {
+  background: var(--surface2);
+  color: var(--dim);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  width: 100%;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  font-family: 'Inconsolata', 'SF Mono', 'Monaco', monospace;
+  cursor: pointer;
+  margin-top: 10px;
+  letter-spacing: 0.08em;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── Calc screen ── */
+.calc-header {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid var(--border);
+}
+.calc-header .ch-badge {
+  font-size: 11px;
+  font-family: 'Inconsolata', 'SF Mono', 'Monaco', monospace;
+  color: var(--muted);
+}
+.calc-header .ch-val {
+  font-size: 12px;
+  font-family: 'Inconsolata', 'SF Mono', 'Monaco', monospace;
+  color: var(--accent);
+}
+.ch-sep { color: var(--dim); }
+
+.calc-btn {
+  width: 100%;
+  padding: 22px;
+  border-radius: 18px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, #3a6fff, #1a4fdd);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+  font-family: 'Syne', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  letter-spacing: 0.12em;
+  margin-top: 6px;
+  transition: all 0.15s;
+  box-shadow: 0 10px 30px rgba(58,111,255,0.35);
+  -webkit-tap-highlight-color: transparent;
+}
+.calc-btn:active { transform: scale(0.97); }
+.calc-btn:disabled {
+  background: var(--surface2);
+  color: var(--dim);
+  box-shadow: none;
+}
+
+/* ── Result screen ── */
+.result-verdict {
+  border-radius: 20px;
+  padding: 24px 20px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  animation: popIn 0.28s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.rv-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  gap: 12px;
+}
+.rv-label {
+  font-weight: 900;
+  line-height: 1;
+  font-size: 32px;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 100%;
+  letter-spacing: -0.01em;
+}
+.rv-sub {
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  font-family: 'Inconsolata', 'SF Mono', 'Monaco', monospace;
+  margin-top: 4px;
+}
+
+.rv-numbers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.rv-num-box {
+  background: rgba(0,0,0,0.2);
+  border-radius: 12px;
+  padding: 13px 14px;
+}
+.rv-num-label {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.4);
+  font-family: 'Inconsolata', 'SF Mono', 'Monaco', monospace;
+  margin-bottom: 4px;
+}
+.rv-num-val {
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 1;
+}
+.rv-details {
+  display: flex;
+  gap: 8px;
+}
+.rv-detail {
+  flex: 1;
+  background: rgba(0,0,0,0.18);
+  border-radius: 10px;
+  padding: 9px 10px;
+  text-align: center;
+}
+.rv-detail .rdl { font-size: 9px; color: rgba(255,255,255,0.3); font-family: 'Inconsolata', 'SF Mono', 'Monaco', monospace; letter-spacing: 0.08em; }
+.rv-detail .rdv { font-size: 15px; font-weight: 700; color: rgba(255,255,255,0.7); margin-top: 2px; }
+
+/* ── History ── */
+.history-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.hs-box {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+.hs-label { font-size: 9px; color: var(--muted); font-family: 'Inconsolata', 'SF Mono', 'Monaco', monospace; letter-spacing: 0.1em; }
+.hs-val { font-size: 20px; font-weight: 800; margin-top: 4px; }
+
+.history-item {
+  background: var(--surface);
+  border-radius: 14px;
+  padding: 13px 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  border: 1px solid var(--border);
+}
+.hi-icon { font-size: 20px; margin-right: 10px; }
+.hi-info .hi-main { font-size: 15px; font-weight: 700; }
+.hi-info .hi-meta { font-size: 11px; color: var(--muted); font-family: 'Inconsolata', 'SF Mono', 'Monaco', monospace; margin-top: 1px; }
+.hi-right { text-align: right; }
+.hi-profit { font-size: 20px; font-weight: 900; }
+.hi-ph { font-size: 10px; color: var(--muted); font-family: 'Inconsolata', 'SF Mono', 'Monaco', monospace; margin-top: 1px; }
+
+/* ── Session tracker ── */
+.session-banner {
+  background: linear-gradient(135deg, rgba(18,245,121,0.08), rgba(18,245,121,0.03));
+  border: 1px solid rgba(18,245,121,0.2);
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.session-pulse {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+  animation: pulse 1.4s ease infinite;
+  flex-shrink: 0;
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.4; transform: scale(0.7); }
+}
+.kpi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.kpi-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 14px 12px;
+}
+.kpi-label {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  font-family: 'Inconsolata', 'SF Mono', 'Monaco', monospace;
+  margin-bottom: 5px;
+}
+.kpi-val {
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1;
+}
+.kpi-val.green { color: var(--green); }
+.kpi-val.accent { color: var(--accent); }
+.kpi-val.yellow { color: var(--yellow); }
+.summary-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.summary-title {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  font-family: 'Inconsolata', 'SF Mono', 'Monaco', monospace;
+  margin-bottom: 12px;
+}
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.summary-row:last-child { border-bottom: none; }
+.summary-row .sr-label { color: var(--muted); font-family: 'Inconsolata', 'SF Mono', 'Monaco', monospace; font-size: 11px; }
+.summary-row .sr-val   { font-weight: 700; }
+.btn-session-start {
+  width: 100%;
+  padding: 18px;
+  border-radius: 16px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, #0a3d1e, #12f579);
+  color: #000;
+  font-size: 16px;
+  font-weight: 900;
+  font-family: 'Syne', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  letter-spacing: 0.08em;
+  box-shadow: 0 6px 24px rgba(18,245,121,0.25);
+  margin-bottom: 10px;
+}
+.btn-session-end {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(249,64,64,0.3);
+  cursor: pointer;
+  background: rgba(249,64,64,0.07);
+  color: var(--red);
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'Syne', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  letter-spacing: 0.08em;
+}
+
+/* ── Bottom nav ── */
+.bottom-nav {
+  display: flex;
+  border-top: 1px solid var(--border);
+  background: rgba(12,14,20,0.96);
+  padding-bottom: 8px;
+  flex-shrink: 0;
+}
+.bn-btn {
+  flex: 1;
+  padding: 10px 8px 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  -webkit-tap-highlight-color: transparent;
+}
+.bn-icon { font-size: 19px; }
+.bn-label { font-size: 10px; font-family: 'Inconsolata', 'SF Mono', 'Monaco', monospace; color: var(--muted); letter-spacing: 0.06em; transition: color 0.2s; }
+.bn-btn.active .bn-label { color: var(--accent); }
+.bn-btn.active .bn-icon { filter: drop-shadow(0 0 6px var(--accent)); }
+.bn-dot { width: 16px; height: 2px; border-radius: 2px; background: var(--accent); display: none; }
+.bn-btn.active .bn-dot { display: block; }
+.bn-btn:not(.active) { opacity: 1; }
+
+/* ── Divider ── */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 16px 0;
+}
+
+/* ── FlutterFlow doc ── */
+.ff-doc {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: #09090f;
+  z-index: 200;
+  overflow-y: auto;
+  padding: 32px 28px;
+  color: #eef2ff;
+  font-family: 'Syne', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+}
+.ff-doc.visible { display: block; }
+.ff-doc h1 { font-size: 24px; font-weight: 900; margin-bottom: 6px; }
+.ff-doc .doc-sub { font-size: 13px; color: rgba(238,242,255,0.4); font-family: 'Inconsolata', 'SF Mono', 'Monaco', monospace; margin-bottom: 28px; }
+.ff-doc h2 { font-size: 15px; font-weight: 700; color: #4f7fff; letter-spacing: 0.08em; margin: 22px 0 12px; text-transform: uppercase; }
+.ff-doc h3 { font-size: 13px; font-weight: 700; color: #eef2ff; margin: 14px 0 7px; }
+.ff-doc p, .ff-doc li { font-size: 13px; color: rgba(238,242,255,0.65); line-height: 1.7; font-family: 'Inconsolata', 'SF Mono', 'Monaco', monospace; }
+.ff-doc ul { padding-left: 16px; margin-top: 4px; }
+.ff-doc li { margin-bottom: 4px; }
+.ff-doc code {
+  background: rgba(79,127,255,0.12);
+  border: 1px solid rgba(79,127,255,0.25);
+  border-radius: 5px;
+  padding: 1px 6px;
+  font-family: 'Inconsolata', 'SF Mono', 'Monaco', monospace;
+  font-size: 12px;
+  color: #7fa8ff;
+}
+.ff-doc .step-card {
+  background: #13161f;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+}
+.ff-doc .step-num {
+  display: inline-block;
+  background: #4f7fff;
+  color: #fff;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 22px;
+  font-size: 11px;
+  font-weight: 800;
+  margin-right: 8px;
+  margin-bottom: 8px;
+}
+.ff-doc .tag {
+  display: inline-block;
+  background: rgba(18,245,121,0.1);
+  border: 1px solid rgba(18,245,121,0.25);
+  color: #12f579;
+  border-radius: 5px;
+  padding: 1px 8px;
+  font-size: 11px;
+  font-family: 'Inconsolata', 'SF Mono', 'Monaco', monospace;
+  margin: 2px;
+}
+.ff-doc .tag.yellow { background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.25); color: #fbbf24; }
+.ff-doc .tag.blue { background: rgba(79,127,255,0.12); border-color: rgba(79,127,255,0.3); color: #7fa8ff; }
+.ff-doc .tag.red { background: rgba(249,64,64,0.1); border-color: rgba(249,64,64,0.25); color: #f94040; }
+.ff-doc .close-btn {
+  position: sticky;
+  top: 0;
+  float: right;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 8px 14px;
+  color: rgba(238,242,255,0.6);
+  font-size: 13px;
+  font-family: 'Inconsolata', 'SF Mono', 'Monaco', monospace;
+  cursor: pointer;
+  margin-bottom: 16px;
+  z-index: 10;
+}
+
+/* page bg */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 60% at 20% 20%, rgba(79,127,255,0.07), transparent),
+              radial-gradient(ellipse 50% 50% at 80% 80%, rgba(18,245,121,0.04), transparent);
+  pointer-events: none;
+}
+
+/* Desktop layout */
+@media (min-width: 900px) {
+  body { gap: 60px; }
+  .phone-shell { flex-shrink: 0; }
+  .side-panel {
+    width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+@media (max-width: 899px) {
+  body { flex-direction: column; align-items: center; padding: 20px; }
+  .side-panel { width: 390px; }
+  .phone-shell { width: 100%; max-width: 390px; height: 750px; }
+}
+</style>
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDfTzKlMR3q4q99nFhRTXMf0lLciPpX1jg",
+    authDomain: "viaje-rentable-89692.firebaseapp.com",
+    projectId: "viaje-rentable-89692",
+    storageBucket: "viaje-rentable-89692.firebasestorage.app",
+    messagingSenderId: "1064306335352",
+    appId: "1:1064306335352:web:b6eaf82102497e7b9e178d"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Make saveToFirebase available globally
+  window.saveToFirebase = async function(data) {
+    try {
+      await addDoc(collection(db, 'consultas'), {
+        ...data,
+        timestamp: serverTimestamp()
+      });
+      console.log('Saved to Firebase');
+    } catch(e) {
+      console.log('Firebase error:', e);
+    }
+  };
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inconsolata:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════ PHONE ═══════ -->
+<div class="phone-shell">
+
+  <!-- Progress -->
+  <div class="progress-bar" id="progress-bar" style="display:none">
+    <div class="progress-dot" id="pd0"></div>
+    <div class="progress-dot" id="pd1"></div>
+    <div class="progress-dot" id="pd2"></div>
+    <div class="progress-dot" id="pd3"></div>
+  </div>
+
+  <div class="screen-wrap">
+
+    <!-- ── STEP 0: Welcome ── -->
+    <div class="screen" id="s0">
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px 0">
+        <div style="font-size:64px;margin-bottom:24px">🚀</div>
+        <div style="font-size:28px;font-weight:900;font-family:'Syne',sans-serif;color:var(--text);margin-bottom:12px;line-height:1.2">Bienvenido a<br>Filtro Inteligente</div>
+        <div style="font-size:14px;color:var(--muted);font-family:'Inconsolata',monospace;line-height:1.8;margin-bottom:28px">
+          Tu asistente inteligente para<br>filtrar viajes y aumentar tu ganancia.<br><br>
+          <span style="color:var(--accent);font-weight:700">Diseñado para:</span><br>
+          Uber · DiDi · InDriver<br>
+          Uber Eats · DiDi Food · Rappi
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;width:100%">
+          <div style="display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:12px;padding:14px 16px">
+            <span style="font-size:20px">🎙️</span>
+            <span style="font-size:12px;color:var(--text);font-family:'Inconsolata',monospace;text-align:left">Dictado de voz — sin tocar la pantalla</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:12px;padding:14px 16px">
+            <span style="font-size:20px">⚡</span>
+            <span style="font-size:12px;color:var(--text);font-family:'Inconsolata',monospace;text-align:left">Decisión en segundos — acepta o rechaza</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:12px;padding:14px 16px">
+            <span style="font-size:20px">📊</span>
+            <span style="font-size:12px;color:var(--text);font-family:'Inconsolata',monospace;text-align:left">Algoritmo adaptativo según tu demanda</span>
+          </div>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="goTo(0.5)">COMENZAR →</button>
+    </div>
+
+    <!-- ── STEP 0.5: How to use ── -->
+    <div class="screen" id="s05">
+      <div style="flex:1;overflow-y:auto">
+        <div class="screen-label">CÓMO USAR LA APP</div>
+        <div class="screen-title" style="font-size:22px">Así de fácil</div>
+        <div style="display:flex;flex-direction:column;gap:12px;margin-top:16px">
+          <div style="background:var(--surface);border-radius:14px;padding:16px;display:flex;gap:14px;align-items:flex-start">
+            <div style="background:var(--accent);color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0">1</div>
+            <div><div style="font-weight:700;font-size:14px;margin-bottom:4px">Recibe un pedido o viaje</div>
+            <div style="font-size:12px;color:var(--muted);font-family:'Inconsolata',monospace">En tu app de Rappi, Uber, DiDi etc.</div></div>
+          </div>
+          <div style="background:var(--surface);border-radius:14px;padding:16px;display:flex;gap:14px;align-items:flex-start">
+            <div style="background:var(--accent);color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0">2</div>
+            <div><div style="font-weight:700;font-size:14px;margin-bottom:4px">Dicta o captura los datos</div>
+            <div style="font-size:12px;color:var(--muted);font-family:'Inconsolata',monospace">Di "85 pesos, 20 minutos, 4 km"<br>o escríbelos manualmente.</div></div>
+          </div>
+          <div style="background:var(--surface);border-radius:14px;padding:16px;display:flex;gap:14px;align-items:flex-start">
+            <div style="background:var(--green);color:#000;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0">3</div>
+            <div><div style="font-weight:700;font-size:14px;margin-bottom:4px">Recibe la decisión al instante</div>
+            <div style="font-size:12px;color:var(--muted);font-family:'Inconsolata',monospace">ACEPTAR ✅ · EVALÚA ⚠️ · RECHAZAR ❌<br>La app habla el resultado en voz alta.</div></div>
+          </div>
+          <div style="background:var(--surface);border-radius:14px;padding:16px;display:flex;gap:14px;align-items:flex-start">
+            <div style="background:var(--yellow);color:#000;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0">4</div>
+            <div><div style="font-weight:700;font-size:14px;margin-bottom:4px">Tip: usa la palabra clave</div>
+            <div style="font-size:12px;color:var(--muted);font-family:'Inconsolata',monospace">Di "calcular" para activar el micrófono<br>sin tocar la pantalla.</div></div>
+          </div>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="goTo(1)" style="margin-top:16px">ENTENDIDO →</button>
+    </div>
+
+    <!-- ── STEP 1: Driver Type ── -->
+    <div class="screen" id="s1">
+      <div class="screen-label">PASO 1 DE 4</div>
+      <div class="screen-title">¿Qué tipo de conductor eres?</div>
+      <div class="screen-sub">Esto nos permite personalizar los cálculos para tu actividad.</div>
+
+      <div id="driver-options">
+        <div class="option-card" id="opt-delivery" onclick="selectDriver('delivery')">
+          <div class="oc-icon">🛵</div>
+          <div class="oc-body">
+            <div class="oc-title">Repartidor</div>
+            <div class="oc-sub">Uber Eats · Rappi · Didi Food · DoorDash</div>
+          </div>
+          <div class="oc-check" id="chk-delivery"></div>
+        </div>
+        <div class="option-card" id="opt-rideshare" onclick="selectDriver('rideshare')">
+          <div class="oc-icon">🚗</div>
+          <div class="oc-body">
+            <div class="oc-title">Conductor de pasajeros</div>
+            <div class="oc-sub">Uber · Didi · Lyft · InDriver</div>
+          </div>
+          <div class="oc-check" id="chk-rideshare"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── STEP 2: Vehicle ── -->
+    <div class="screen" id="s2">
+      <div class="screen-label">PASO 2 DE 4</div>
+      <div class="screen-title" id="s2-title">¿Qué vehículo usas?</div>
+      <div class="screen-sub">Los costos predeterminados se ajustan a tu vehículo.</div>
+
+      <div class="vehicle-grid" id="vehicle-list"></div>
+
+      <button class="btn-secondary" onclick="goTo(1)">← Volver</button>
+    </div>
+
+    <!-- ── STEP 2.5: Incentive ── -->
+    <div class="screen" id="s25">
+      <div class="screen-label">PASO 3 DE 4</div>
+      <div class="screen-title">¿Tienes un incentivo hoy?</div>
+      <div class="screen-sub">Algunas plataformas ofrecen bonos por completar cierta cantidad de viajes.</div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:auto">
+        <!-- YES option -->
+        <div class="option-card" id="inc-yes" onclick="selectIncentive(true)">
+          <div class="oc-icon">🎯</div>
+          <div class="oc-body">
+            <div class="oc-title">Sí, tengo incentivo</div>
+            <div class="oc-sub">La app sumará el bono a cada pedido</div>
+          </div>
+          <div class="oc-check" id="chk-inc-yes"></div>
+        </div>
+
+        <!-- NO option -->
+        <div class="option-card" id="inc-no" onclick="selectIncentive(false)">
+          <div class="oc-icon">🚫</div>
+          <div class="oc-body">
+            <div class="oc-title">No, sin incentivo</div>
+            <div class="oc-sub">Calcular solo con el pago del pedido</div>
+          </div>
+          <div class="oc-check" id="chk-inc-no"></div>
+        </div>
+
+        <!-- Incentive fields — shown only if YES -->
+        <div id="s25-fields" style="display:none;flex-direction:column;gap:10px">
+          <div style="height:1px;background:rgba(255,255,255,0.07);margin:4px 0"></div>
+          <div class="input-group">
+            <label class="input-label">BONO TOTAL</label>
+            <div class="input-wrap">
+              <span class="input-prefix">$</span>
+              <input type="number" inputmode="decimal" id="s25-bonus" placeholder="100" oninput="updateS25Preview()">
+            </div>
+          </div>
+          <div class="input-group">
+            <label class="input-label">NÚMERO DE VIAJES REQUERIDOS</label>
+            <div class="input-wrap">
+              <input type="number" inputmode="numeric" id="s25-orders" placeholder="10" oninput="updateS25Preview()">
+              <span style="color:rgba(238,242,255,0.3);font-family:'Inconsolata',monospace;font-size:13px;white-space:nowrap">viajes</span>
+            </div>
+          </div>
+          <!-- Preview -->
+          <div id="s25-preview" style="display:none;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);border-radius:12px;padding:12px 16px;align-items:center;gap:12px">
+            <span style="font-size:22px">✨</span>
+            <div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.4);font-family:'Inconsolata',monospace;letter-spacing:0.1em">EXTRA POR VIAJE</div>
+              <div style="font-size:26px;font-weight:900;color:#fbbf24" id="s25-per-order">$10</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="btn-s25-continue" onclick="goTo(3)" style="display:none;margin-top:8px">CONTINUAR →</button>
+      <button class="btn-secondary" onclick="goTo(2)">← Volver</button>
+    </div>
+
+    <!-- ── STEP 3: Config ── -->
+    <div class="screen" id="s3" style="overflow-y:auto">
+      <div class="screen-label">PASO 4 DE 4</div>
+      <div class="screen-title">Configuración del vehículo</div>
+      <div class="screen-sub">Puedes ajustarlo después en configuración.</div>
+
+      <div id="s3-fuel-fields">
+        <div class="input-group">
+          <label class="input-label">RENDIMIENTO DE TU VEHÍCULO <span style="font-size:10px;color:var(--accent);font-weight:600">(KM/LITRO)</span></label>
+          <div class="input-wrap">
+            <input type="number" inputmode="decimal" id="s3-rendimiento" placeholder="10" step="1" oninput="recalcCpkm('s3')">
+            <span style="color:var(--muted);font-family:'Inconsolata',monospace;font-size:13px;white-space:nowrap">km / litro</span>
+          </div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">PRECIO DEL LITRO DE GASOLINA</label>
+          <div class="input-wrap"><span class="input-prefix">$</span><input type="number" inputmode="decimal" id="s3-gasolina" placeholder="22" step="0.50" oninput="recalcCpkm('s3')"></div>
+        </div>
+        <div class="input-group" id="s3-cpkm-group">
+          <label class="input-label">COSTO POR KM <span style="color:var(--accent);font-size:9px;letter-spacing:0.1em">CALCULADO AUTOMÁTICAMENTE</span></label>
+          <div class="input-wrap" style="opacity:0.6;pointer-events:none">
+            <span class="input-prefix">$</span>
+            <input type="number" inputmode="decimal" id="s3-cpkm" placeholder="—" readonly style="color:var(--accent)">
+          </div>
+        </div>
+      </div>
+      <!-- Non-fuel: spacer so layout stays clean -->
+      <div id="s3-manual-cpkm" style="display:none"></div>
+      <div class="input-group">
+        <label class="input-label">GANANCIA MÍNIMA POR HORA</label>
+        <div class="input-wrap"><span class="input-prefix">$</span><input type="number" inputmode="decimal" id="s3-mph" placeholder="120" step="10"></div>
+        <div style="font-size:10px;color:var(--muted);font-family:'Inconsolata',monospace;margin-top:6px;text-align:center" id="mph-hint">
+          Sugerido según tu tipo de conductor
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="finishOnboarding()" style="margin-top:auto">
+        EMPEZAR A USAR →
+      </button>
+      <button class="btn-secondary" onclick="goTo(2.5)">← Volver</button>
+    </div>
+
+    <!-- ── MAIN: Calculator ── -->
+    <div class="screen" id="s-calc">
+
+      <!-- Platform selector (dynamic per driver type) -->
+      <div id="platform-bar" style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap"></div>
+
+      <!-- Fuel vehicle header -->
+      <div class="calc-header" id="fuel-header">
+        <div>
+          <div class="ch-badge">VEHÍCULO</div>
+          <div class="ch-val" id="ch-vehicle">Moto</div>
+        </div>
+        <div class="ch-sep">·</div>
+        <div>
+          <div class="ch-badge">$/KM</div>
+          <div class="ch-val" id="ch-cpkm">$2.50</div>
+        </div>
+      </div>
+
+      <!-- Non-fuel header -->
+      <div id="nofuel-header" style="display:none;background:rgba(18,245,121,0.07);border:1px solid rgba(18,245,121,0.2);border-radius:14px;padding:12px 16px;margin-bottom:14px;align-items:center;gap:10px">
+        <span style="font-size:20px">✅</span>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--green)" id="ch-vehicle-nf">Bicicleta</div>
+          <div style="font-size:10px;color:var(--muted);font-family:'Inconsolata',monospace">Ganancia = pago completo</div>
+        </div>
+      </div>
+      <div style="text-align:center;margin:-4px 0 10px 0">
+        <span id="query-counter" style="font-size:10px;font-family:'Inconsolata',monospace;color:var(--muted)">8 consultas gratis hoy</span>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label" id="payment-label">PAGO DEL PEDIDO</label>
+        <div class="input-wrap"><span class="input-prefix">$</span><input type="number" inputmode="decimal" id="c-payment" placeholder="0" oninput="autoCalc()"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="input-group" id="min-field-group">
+          <label class="input-label">MINUTOS <span id="min-estimated" style="color:var(--accent);font-size:9px;letter-spacing:0.1em;display:none">ESTIMADO</span></label>
+          <div class="input-wrap"><input type="number" inputmode="numeric" id="c-min" placeholder="—" oninput="onMinInput()"></div>
+          <div id="min-auto-note" style="display:none;font-size:10px;color:var(--accent);font-family:'Inconsolata',monospace;margin-top:4px">⚡ Estimado automáticamente · puedes ajustarlo</div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">KILÓMETROS</label>
+          <div class="input-wrap"><input type="number" inputmode="decimal" step="0.1" id="c-km" placeholder="0.0" oninput="onKmInput()"></div>
+        </div>
+      </div>
+
+      <div id="calc-indicator" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;opacity:0;transition:opacity 0.3s;font-family:'Inconsolata',monospace;font-size:11px;color:rgba(238,242,255,0.3);letter-spacing:0.1em">
+        <span id="ci-pay" style="transition:color 0.2s">$ —</span>
+        <span style="opacity:0.3">·</span>
+        <span id="ci-km" style="transition:color 0.2s">km —</span>
+        <span style="opacity:0.3">·</span>
+        <span id="ci-min" style="transition:color 0.2s">min —</span>
+      </div>
+
+      <!-- Incentive toggle bar -->
+      <div id="incentive-bar" style="display:none;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);border-radius:14px;padding:12px 16px;margin-top:4px;align-items:center;justify-content:space-between;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:18px">🎯</span>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:#fbbf24" id="incentive-label">+$10 por pedido</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.4);font-family:'Inconsolata',monospace">Incentivo activo</div>
+          </div>
+        </div>
+        <button onclick="toggleIncentive()" style="background:rgba(251,191,36,0.15);border:1px solid rgba(251,191,36,0.3);border-radius:8px;padding:6px 12px;color:#fbbf24;font-size:11px;font-family:'Inconsolata',monospace;cursor:pointer;white-space:nowrap" id="incentive-toggle-btn">✓ ON</button>
+      </div>
+
+      <!-- Activate incentive button -->
+      <button onclick="showIncentiveModal()" id="incentive-add-btn" style="width:100%;margin-top:10px;padding:12px;background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.5);border-radius:12px;color:#d97706;font-size:12px;font-family:'Inconsolata',monospace;cursor:pointer;letter-spacing:0.08em">
+        🎯 &nbsp;TENGO UN INCENTIVO ACTIVO
+      </button>
+    </div>
+
+    <!-- Incentive modal -->
+    <div id="incentive-modal" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.85);z-index:50;align-items:flex-end;justify-content:center;padding:20px">
+      <div style="background:#13161f;border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:24px 20px;width:100%">
+        <div style="font-size:18px;font-weight:800;margin-bottom:4px">🎯 Incentivo de plataforma</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);font-family:'Inconsolata',monospace;margin-bottom:20px">Completa N pedidos y gana un bono extra</div>
+
+        <div style="margin-bottom:14px">
+          <div style="font-size:10px;color:rgba(255,255,255,0.4);font-family:'Inconsolata',monospace;letter-spacing:0.12em;margin-bottom:7px">BONO TOTAL</div>
+          <div style="display:flex;align-items:center;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);border-radius:12px;padding:13px 16px;gap:8px">
+            <span style="font-size:20px;color:rgba(255,255,255,0.3);font-weight:600">$</span>
+            <input type="number" inputmode="decimal" id="modal-bonus" placeholder="100" style="background:none;border:none;outline:none;color:#fff;font-size:26px;font-weight:700;font-family:'Syne',sans-serif;width:100%" oninput="updateIncentivePreview()">
+          </div>
+        </div>
+
+        <div style="margin-bottom:20px">
+          <div style="font-size:10px;color:rgba(255,255,255,0.4);font-family:'Inconsolata',monospace;letter-spacing:0.12em;margin-bottom:7px">PEDIDOS REQUERIDOS</div>
+          <div style="display:flex;align-items:center;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);border-radius:12px;padding:13px 16px;gap:8px">
+            <input type="number" inputmode="numeric" id="modal-orders" placeholder="10" style="background:none;border:none;outline:none;color:#fff;font-size:26px;font-weight:700;font-family:'Syne',sans-serif;width:100%" oninput="updateIncentivePreview()">
+            <span style="font-size:13px;color:rgba(255,255,255,0.3);font-family:'Inconsolata',monospace;white-space:nowrap">pedidos</span>
+          </div>
+        </div>
+
+        <!-- Preview -->
+        <div id="incentive-preview" style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);border-radius:12px;padding:12px 16px;margin-bottom:16px;display:none;align-items:center;gap:10px">
+          <span style="font-size:20px">✨</span>
+          <div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.4);font-family:'Inconsolata',monospace">VALE EXTRA POR PEDIDO</div>
+            <div style="font-size:22px;font-weight:800;color:#fbbf24" id="preview-per-order">$10</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <button onclick="closeIncentiveModal()" style="padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:rgba(255,255,255,0.5);font-size:13px;font-family:'Inconsolata',monospace;cursor:pointer">Cancelar</button>
+          <button onclick="applyIncentive()" id="apply-incentive-btn" disabled style="padding:16px;border-radius:12px;border:none;background:linear-gradient(135deg,#a07000,#fbbf24);color:#000;font-size:14px;font-weight:800;font-family:'Syne',sans-serif;cursor:pointer;opacity:0.4">ACTIVAR</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MAIN: Result ── -->
+    <div class="screen" id="s-result">
+      <div id="result-card" class="result-verdict">
+        <div class="rv-top">
+          <div>
+            <div style="overflow:hidden;width:100%;min-width:0"><div class="rv-label" id="rv-verdict">ACEPTAR</div></div>
+            <div class="rv-sub" id="rv-sub">Excelente pedido</div>
+          </div>
+        </div>
+        <div class="rv-numbers">
+          <div class="rv-num-box">
+            <div class="rv-num-label">GANANCIA REAL</div>
+            <div class="rv-num-val" id="rv-profit">$0</div>
+          </div>
+          <div class="rv-num-box">
+            <div class="rv-num-label">POR HORA</div>
+            <div class="rv-num-val" id="rv-ph">$0/h</div>
+          </div>
+        </div>
+        <div class="rv-details">
+          <div class="rv-detail"><div class="rdl">COSTO VIAJE" style="display:none</div><div class="rdv" id="rv-cost" style="display:none">$0</div></div>
+          <div class="rv-detail"><div class="rdl">PAGADO</div><div class="rdv" id="rv-pay">$0</div></div>
+          <div class="rv-detail"><div class="rdl">$/KM NETO</div><div class="rdv" id="rv-pkm">$0</div></div>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="newOrder()">← NUEVO PEDIDO</button>
+    </div>
+
+    <!-- ── Paywall ── -->
+    <div id="s-paywall" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center">
+      <div style="font-size:48px;margin-bottom:16px">🔒</div>
+      <div style="font-size:22px;font-weight:900;font-family:'Syne',sans-serif;color:var(--text);margin-bottom:8px">Límite diario alcanzado</div>
+      <div style="font-size:13px;color:var(--muted);font-family:'Inconsolata',monospace;margin-bottom:32px;line-height:1.6">Usaste tus 8 consultas gratis de hoy.<br>Suscríbete para consultas ilimitadas.</div>
+
+      <!-- Pricing card -->
+      <div style="background:var(--surface);border:2px solid var(--accent);border-radius:20px;padding:28px;width:100%;max-width:280px;margin-bottom:24px">
+        <div style="font-size:11px;font-weight:700;color:var(--accent);font-family:'Inconsolata',monospace;letter-spacing:0.1em;margin-bottom:8px">FILTRO INTELIGENTE PRO</div>
+        <div style="font-size:42px;font-weight:900;font-family:'Syne',sans-serif;color:var(--text)">$35</div>
+        <div style="font-size:12px;color:var(--muted);font-family:'Inconsolata',monospace;margin-bottom:20px">pesos / mes</div>
+        <div style="font-size:12px;color:var(--text);font-family:'Inconsolata',monospace;line-height:2;text-align:left">
+          ✅ Consultas ilimitadas<br>
+          ✅ Historial completo<br>
+          ✅ Sesiones de trabajo<br>
+          ✅ Sin anuncios
+        </div>
+      </div>
+
+      <button onclick="activatePremium('monthly')" style="width:100%;max-width:280px;padding:18px;background:var(--accent);border:none;border-radius:14px;color:#fff;font-size:16px;font-weight:800;font-family:'Syne',sans-serif;cursor:pointer;margin-bottom:10px">
+        MENSUAL — $35/mes
+      </button>
+      <button onclick="activatePremium('annual')" style="width:100%;max-width:280px;padding:16px;background:linear-gradient(135deg,#059652,#12f579);border:none;border-radius:14px;color:#000;font-size:15px;font-weight:800;font-family:'Syne',sans-serif;cursor:pointer;margin-bottom:14px;position:relative">
+        ANUAL — $25/mes
+        <span style="position:absolute;top:-10px;right:12px;background:#fbbf24;color:#000;font-size:9px;font-weight:900;padding:3px 8px;border-radius:20px;font-family:'Inconsolata',monospace">AHORRA $10/MES</span>
+      </button>
+      <button onclick="closePaywall()" style="background:none;border:none;color:var(--muted);font-size:12px;font-family:'Inconsolata',monospace;cursor:pointer;padding:8px">
+        Volver · consultas gratis se reinician mañana
+      </button>
+    </div>
+
+    <!-- ── MAIN: History ── -->
+    <!-- ── MAIN: Session ── -->
+    <div class="screen" id="s-session">
+      <div class="screen-label" id="sess-label">SESIÓN DE HOY</div>
+
+      <!-- NO SESSION STATE -->
+      <div id="no-session">
+        <div style="text-align:center;padding:32px 0 24px">
+          <div style="font-size:48px;margin-bottom:12px">⏱</div>
+          <div style="font-size:18px;font-weight:800;margin-bottom:8px">Sin sesión activa</div>
+          <div style="font-size:12px;color:var(--muted);font-family:'Inconsolata',monospace;line-height:1.6">Inicia una sesión para trackear<br>tus ganancias en tiempo real</div>
+        </div>
+        <button class="btn-session-start" onclick="startSession()">▶ &nbsp;INICIAR SESIÓN</button>
+      </div>
+
+      <!-- ACTIVE SESSION STATE -->
+      <div id="active-session" style="display:none">
+        <!-- Live banner -->
+        <div class="session-banner">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="session-pulse"></div>
+            <div>
+              <div style="font-size:10px;color:var(--muted);font-family:'Inconsolata',monospace;letter-spacing:0.1em">SESIÓN ACTIVA DESDE</div>
+              <div style="font-size:16px;font-weight:800;color:var(--green)" id="sess-start-display">09:12</div>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:10px;color:var(--muted);font-family:'Inconsolata',monospace;letter-spacing:0.1em">TIEMPO</div>
+            <div style="font-size:20px;font-weight:900;font-family:'Inconsolata',monospace;color:var(--text)" id="sess-elapsed">0h 00m</div>
+          </div>
+        </div>
+
+        <!-- KPI grid -->
+        <div class="kpi-grid">
+          <div class="kpi-box">
+            <div class="kpi-label">GANANCIA HOY</div>
+            <div class="kpi-val green" id="sess-earnings">$0</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-label">GANANCIA/HORA</div>
+            <div class="kpi-val accent" id="sess-hourly">$0/h</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-label">VIAJES HOY</div>
+            <div class="kpi-val" id="sess-trips">0</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-label">PROMEDIO/VIAJE</div>
+            <div class="kpi-val yellow" id="sess-avg">$0</div>
+          </div>
+        </div>
+
+        <button class="btn-session-end" onclick="endSession()">⏹ &nbsp;FINALIZAR SESIÓN</button>
+        <div style="height:12px"></div>
+      </div>
+
+      <!-- DAILY SUMMARY (always visible if data exists) -->
+      <div id="daily-summary" style="display:none">
+        <div class="summary-card">
+          <div class="summary-title">📅 &nbsp;RESUMEN DE HOY</div>
+          <div class="summary-row"><span class="sr-label">Total ganado</span><span class="sr-val green" id="ds-earned">$0</span></div>
+          <div class="summary-row"><span class="sr-label">Horas trabajadas</span><span class="sr-val" id="ds-hours">0h 0m</span></div>
+          <div class="summary-row"><span class="sr-label">Ganancia promedio/hora</span><span class="sr-val accent" id="ds-hourly">$0/h</span></div>
+          <div class="summary-row"><span class="sr-label">Viajes analizados</span><span class="sr-val" id="ds-trips">0</span></div>
+        </div>
+      </div>
+
+      <!-- WEEKLY SUMMARY -->
+      <div id="weekly-summary" style="display:none">
+        <div class="summary-card">
+          <div class="summary-title">📆 &nbsp;RESUMEN SEMANAL</div>
+
+          <!-- Bar chart -->
+          <div style="margin-bottom:14px">
+            <div id="week-chart" style="display:flex;align-items:flex-end;justify-content:space-between;gap:6px;height:140px;padding:0 2px"></div>
+            <div id="chart-debug" style="font-size:9px;color:var(--muted);font-family:'Inconsolata',monospace;text-align:center;margin-bottom:4px"></div>
+            <div style="display:flex;justify-content:space-between;margin-top:5px;padding:0 2px">
+              <span id="wc-d0" style="font-size:9px;color:var(--muted);font-family:'Inconsolata',monospace;text-align:center;flex:1">L</span>
+              <span id="wc-d1" style="font-size:9px;color:var(--muted);font-family:'Inconsolata',monospace;text-align:center;flex:1">M</span>
+              <span id="wc-d2" style="font-size:9px;color:var(--muted);font-family:'Inconsolata',monospace;text-align:center;flex:1">X</span>
+              <span id="wc-d3" style="font-size:9px;color:var(--muted);font-family:'Inconsolata',monospace;text-align:center;flex:1">J</span>
+              <span id="wc-d4" style="font-size:9px;color:var(--muted);font-family:'Inconsolata',monospace;text-align:center;flex:1">V</span>
+              <span id="wc-d5" style="font-size:9px;color:var(--muted);font-family:'Inconsolata',monospace;text-align:center;flex:1">S</span>
+              <span id="wc-d6" style="font-size:9px;color:var(--muted);font-family:'Inconsolata',monospace;text-align:center;flex:1">D</span>
+            </div>
+          </div>
+
+          <div class="summary-row"><span class="sr-label">Total ganado</span><span class="sr-val green" id="ws-earned">$0</span></div>
+          <div class="summary-row"><span class="sr-label">Horas trabajadas</span><span class="sr-val" id="ws-hours">0h</span></div>
+          <div class="summary-row"><span class="sr-label">Ganancia promedio/hora</span><span class="sr-val accent" id="ws-hourly">$0/h</span></div>
+          <div class="summary-row"><span class="sr-label">Viajes analizados</span><span class="sr-val" id="ws-trips">0</span></div>
+        </div>
+      </div>
+
+      <!-- No data placeholder -->
+      <div id="no-session-data" style="display:none;text-align:center;padding:20px 0;color:var(--muted);font-family:'Inconsolata',monospace;font-size:11px">
+        Completa tu primera sesión para ver el resumen
+      </div>
+    </div>
+
+    <!-- ── Paywall ── -->
+    <div id="s-paywall" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center">
+      <div style="font-size:48px;margin-bottom:16px">🔒</div>
+      <div style="font-size:22px;font-weight:900;font-family:'Syne',sans-serif;color:var(--text);margin-bottom:8px">Límite diario alcanzado</div>
+      <div style="font-size:13px;color:var(--muted);font-family:'Inconsolata',monospace;margin-bottom:32px;line-height:1.6">Usaste tus 8 consultas gratis de hoy.<br>Suscríbete para consultas ilimitadas.</div>
+
+      <!-- Pricing card -->
+      <div style="background:var(--surface);border:2px solid var(--accent);border-radius:20px;padding:28px;width:100%;max-width:280px;margin-bottom:24px">
+        <div style="font-size:11px;font-weight:700;color:var(--accent);font-family:'Inconsolata',monospace;letter-spacing:0.1em;margin-bottom:8px">FILTRO INTELIGENTE PRO</div>
+        <div style="font-size:42px;font-weight:900;font-family:'Syne',sans-serif;color:var(--text)">$35</div>
+        <div style="font-size:12px;color:var(--muted);font-family:'Inconsolata',monospace;margin-bottom:20px">pesos / mes</div>
+        <div style="font-size:12px;color:var(--text);font-family:'Inconsolata',monospace;line-height:2;text-align:left">
+          ✅ Consultas ilimitadas<br>
+          ✅ Historial completo<br>
+          ✅ Sesiones de trabajo<br>
+          ✅ Sin anuncios
+        </div>
+      </div>
+
+      <button onclick="activatePremium('monthly')" style="width:100%;max-width:280px;padding:18px;background:var(--accent);border:none;border-radius:14px;color:#fff;font-size:16px;font-weight:800;font-family:'Syne',sans-serif;cursor:pointer;margin-bottom:10px">
+        MENSUAL — $35/mes
+      </button>
+      <button onclick="activatePremium('annual')" style="width:100%;max-width:280px;padding:16px;background:linear-gradient(135deg,#059652,#12f579);border:none;border-radius:14px;color:#000;font-size:15px;font-weight:800;font-family:'Syne',sans-serif;cursor:pointer;margin-bottom:14px;position:relative">
+        ANUAL — $25/mes
+        <span style="position:absolute;top:-10px;right:12px;background:#fbbf24;color:#000;font-size:9px;font-weight:900;padding:3px 8px;border-radius:20px;font-family:'Inconsolata',monospace">AHORRA $10/MES</span>
+      </button>
+      <button onclick="closePaywall()" style="background:none;border:none;color:var(--muted);font-size:12px;font-family:'Inconsolata',monospace;cursor:pointer;padding:8px">
+        Volver · consultas gratis se reinician mañana
+      </button>
+    </div>
+
+    <!-- ── MAIN: History ── -->
+    <div class="screen" id="s-history">
+      <div class="screen-label">HISTORIAL DE HOY</div>
+      <div class="history-summary">
+        <div class="hs-box"><div class="hs-label">PEDIDOS</div><div class="hs-val" id="h-total">0</div></div>
+        <div class="hs-box"><div class="hs-label">GANANCIA</div><div class="hs-val" style="color:var(--green)" id="h-earn">$0</div></div>
+        <div class="hs-box"><div class="hs-label">ACEPTADOS</div><div class="hs-val" style="color:var(--accent)" id="h-acc">0</div></div>
+      </div>
+      <div id="history-list">
+        <div style="text-align:center;padding:40px 0;color:var(--muted);font-family:'Inconsolata',monospace;font-size:13px">
+          <div style="font-size:36px;margin-bottom:12px">📋</div>
+          Aún no hay pedidos calculados.
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MAIN: Settings ── -->
+    <div class="screen" id="s-settings">
+      <div class="screen-label">CONFIGURACIÓN</div>
+      <div class="screen-title" style="font-size:22px;margin-bottom:18px">Ajustes del vehículo</div>
+
+      <div id="cfg-fuel-fields">
+        <div class="input-group">
+          <label class="input-label">RENDIMIENTO DE TU VEHÍCULO <span style="font-size:10px;color:var(--accent);font-weight:600">(KM/LITRO)</span></label>
+          <div class="input-wrap">
+            <input type="number" inputmode="decimal" id="cfg-rendimiento" placeholder="10" step="1" oninput="recalcCpkm('cfg')">
+            <span style="color:rgba(238,242,255,0.3);font-family:'Inconsolata',monospace;font-size:13px;white-space:nowrap">km / litro</span>
+          </div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">PRECIO DEL LITRO DE GASOLINA</label>
+          <div class="input-wrap"><span class="input-prefix">$</span><input type="number" inputmode="decimal" id="cfg-gasolina" placeholder="22" step="0.50" oninput="recalcCpkm('cfg')"></div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">COSTO POR KM <span style="color:var(--accent);font-size:9px;letter-spacing:0.1em">CALCULADO</span></label>
+          <div class="input-wrap" style="opacity:0.6;pointer-events:none">
+            <span class="input-prefix">$</span>
+            <input type="number" id="cfg-cpkm" placeholder="—" readonly style="color:var(--accent)">
+          </div>
+        </div>
+      </div>
+      <div id="cfg-manual-cpkm" style="display:none"></div>
+      <div class="input-group">
+        <label class="input-label">MÍNIMO GANANCIA/HORA</label>
+        <div class="input-wrap"><span class="input-prefix">$</span><input type="number" inputmode="decimal" id="cfg-mph" step="10"></div>
+      </div>
+
+      <button class="btn-primary" id="save-btn" onclick="saveSettings()">GUARDAR CAMBIOS</button>
+
+      <div class="divider"></div>
+      <!-- Wake word toggle -->
+      <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px">
+        <div>
+          <div style="font-size:12px;font-weight:700;margin-bottom:2px">🎙️ Escucha en segundo plano</div>
+          <div style="font-size:10px;color:var(--muted);font-family:'Inconsolata',monospace">Di "calcular" para activar sin tocar la app</div>
+        </div>
+        <button id="wake-toggle-btn" onclick="toggleWakeWord()" style="padding:8px 14px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:#fff;font-size:11px;font-family:'Inconsolata',monospace;cursor:pointer">ON</button>
+      </div>
+
+      <div class="divider"></div>
+      <!-- Theme toggle -->
+      <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px">
+        <div>
+          <div style="font-size:12px;font-weight:700;margin-bottom:2px" id="theme-label">🌙 Modo nocturno</div>
+          <div style="font-size:10px;color:var(--muted);font-family:'Inconsolata',monospace">Automático según la hora</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button onclick="setTheme('auto')"  id="tbtn-auto"  style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-size:10px;font-family:'Inconsolata',monospace;cursor:pointer;transition:all 0.2s">AUTO</button>
+          <button onclick="setTheme('dark')"  id="tbtn-dark"  style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-size:10px;font-family:'Inconsolata',monospace;cursor:pointer;transition:all 0.2s">🌙</button>
+          <button onclick="setTheme('light')" id="tbtn-light" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-size:10px;font-family:'Inconsolata',monospace;cursor:pointer;transition:all 0.2s">☀️</button>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Current vehicle info -->
+      <div style="background:rgba(79,127,255,0.07);border:1px solid rgba(79,127,255,0.18);border-radius:14px;padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:9px;color:var(--muted);font-family:'Inconsolata',monospace;letter-spacing:0.12em;margin-bottom:4px">CONFIGURACIÓN ACTUAL</div>
+          <div style="font-size:14px;font-weight:700">
+            <span id="cfg-veh-icon" style="margin-right:6px">🛵</span>
+            <span id="cfg-veh-label">Moto</span>
+          </div>
+          <div style="font-size:11px;color:var(--muted);font-family:'Inconsolata',monospace;margin-top:2px">
+            <span id="cfg-type-label">Repartidor</span>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:9px;color:var(--muted);font-family:'Inconsolata',monospace;letter-spacing:0.1em">COSTO/KM</div>
+          <div style="font-size:18px;font-weight:800;color:var(--accent)" id="cfg-cpkm-display">$—</div>
+        </div>
+      </div>
+
+      <button onclick="changeVehicle()" style="width:100%;padding:18px;border-radius:16px;border:none;cursor:pointer;background:linear-gradient(135deg,#1a3a6a,#2a5aaa);color:#fff;font-size:15px;font-weight:800;font-family:'Syne',sans-serif;letter-spacing:0.08em;margin-bottom:10px;box-shadow:0 6px 20px rgba(42,90,170,0.3)">
+        🔄 &nbsp;CAMBIAR VEHÍCULO
+      </button>
+      <button class="btn-secondary" onclick="resetOnboarding()">Cambiar tipo de conductor</button>
+    </div>
+  </div><!-- bottom-nav-wrap -->
+
+<!-- Bottom nav (hidden during onboarding) -->
+  <div id="bottom-nav-wrap" style="display:none;flex-direction:column;flex-shrink:0">
+    <!-- Voice bar row -->
+    <div id="voice-bar" style="padding:8px 16px 0;background:rgba(12,14,20,0.96)">
+      <div id="voice-status" style="display:none;background:rgba(79,127,255,0.08);border:1px solid rgba(79,127,255,0.2);border-radius:10px;padding:8px 12px;margin-bottom:6px;font-family:'Inconsolata',monospace;font-size:11px;color:rgba(79,127,255,0.9);text-align:center"></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+        <button id="mic-btn" onclick="toggleVoice()" style="width:72px;height:72px;border-radius:50%;border:none;background:#25D366;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;box-shadow:0 4px 20px rgba(37,211,102,0.4)">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2H3v2a9 9 0 0 0 8 8.94V23h2v-2.06A9 9 0 0 0 21 12v-2h-2z"/>
+          </svg>
+        </button>
+        <span id="mic-text" style="font-size:11px;color:var(--muted);font-family:'Inconsolata',monospace;letter-spacing:0.08em">DICTAR PEDIDO</span>
+      </div>
+    </div>
+    <div class="bottom-nav" id="bottom-nav">
+    <button class="bn-btn active" id="bn-calc" onclick="showMain('calc')">
+      <span class="bn-icon">⚡</span>
+      <span class="bn-label">Calcular</span>
+      <div class="bn-dot"></div>
+    </button>
+    <button class="bn-btn" id="bn-session" onclick="showMain('session')">
+      <span class="bn-icon">⏱</span>
+      <span class="bn-label">Sesión</span>
+      <div class="bn-dot"></div>
+    </button>
+    <button class="bn-btn" id="bn-hist" onclick="showMain('history')">
+      <span class="bn-icon">📋</span>
+      <span class="bn-label">Historial</span>
+      <div class="bn-dot"></div>
+    </button>
+    <button class="bn-btn" id="bn-cfg" onclick="showMain('settings')">
+      <span class="bn-icon">⚙️</span>
+      <span class="bn-label">Config</span>
+      <div class="bn-dot"></div>
+    </button>
+  </div>
+</div>
+
+  </div><!-- screen-wrap -->
+
+<!-- ═════════════════════════════════════ SIDE PANEL ═══ -->
+<div class="side-panel">
+  <!-- ═══════════════════════════════ FLUTTERFLOW DOC ═══ -->
+<div class="ff-doc" id="ff-doc" style="display:none!important;pointer-events:none">
+<button class="close-btn" onclick="document.getElementById('ff-doc').classList.remove('visible')">✕ Cerrar</button>
+<h1>📘 DriverProfit — Guía FlutterFlow</h1>
+<div class="doc-sub">Implementación nativa sin custom code · Solo state variables y condicionales</div>
+
+<h2>1 · App State Variables</h2>
+<div class="step-card">
+  <h3>Crear en App State (Settings → App State)</h3>
+  <ul>
+    <li><code>userType</code> — <span class="tag blue">String</span> — <code>""</code></li>
+    <li><code>vehicleType</code> — <span class="tag blue">String</span> — <code>""</code></li>
+    <li><code>vehicleLabel</code> — <span class="tag blue">String</span> — <code>""</code></li>
+    <li><code>costPerKm</code> — <span class="tag yellow">Double</span> — <code>2.5</code></li>
+    <li><code>minProfitPerHour</code> — <span class="tag yellow">Double</span> — <code>120.0</code></li>
+    <li><code>onboardingDone</code> — <span class="tag">Boolean</span> — <code>false</code></li>
+    <li><code>orderHistory</code> — <span class="tag red">JSON List</span> — <code>[]</code> (Persist: true)</li>
+  </ul>
+</div>
+
+<h2>2 · Estructura de páginas</h2>
+<div class="step-card">
+  <p>Crear 5 páginas en FlutterFlow:</p>
+  <ul>
+    <li><code>SplashRouter</code> — decide si mostrar onboarding o app</li>
+    <li><code>OnboardingDriverType</code> — pantalla 1</li>
+    <li><code>OnboardingVehicle</code> — pantalla 2</li>
+    <li><code>OnboardingConfig</code> — pantalla 3</li>
+    <li><code>MainApp</code> — calculadora + historial + settings (con BottomNav)</li>
+  </ul>
+</div>
+
+<h2>3 · SplashRouter</h2>
+<div class="step-card">
+  <p>En <strong>On Page Load</strong> agregar acción condicional:</p>
+  <ul>
+    <li>IF <code>appState.onboardingDone == true</code> → Navigate to <code>MainApp</code></li>
+    <li>ELSE → Navigate to <code>OnboardingDriverType</code></li>
+  </ul>
+</div>
+
+<h2>4 · OnboardingDriverType</h2>
+<div class="step-card">
+  <h3>Page State variable local:</h3>
+  <ul><li><code>selectedDriver</code> — String — <code>""</code></li></ul>
+  <h3>Layout:</h3>
+  <ul>
+    <li>Column → Text "¿Qué tipo de conductor eres?"</li>
+    <li>2× <strong>GestureDetector</strong> o <strong>InkWell</strong> sobre Container</li>
+    <li>Cada card: On Tap → Update Page State <code>selectedDriver</code> = "delivery" / "rideshare"</li>
+    <li>Usar <strong>Conditional Visibility</strong> en el ícono de check: visible si <code>selectedDriver == "delivery"</code></li>
+    <li>Cambiar color del border con <strong>Conditional Value</strong>: si seleccionado → <code>#4F7FFF</code>, sino → <code>#1A1E2A</code></li>
+  </ul>
+  <h3>Botón CONTINUAR:</h3>
+  <ul>
+    <li>Enabled condition: <code>selectedDriver != ""</code></li>
+    <li>On Tap Actions:
+      <ol>
+        <li>Update App State: <code>userType = selectedDriver</code></li>
+        <li>Navigate to <code>OnboardingVehicle</code></li>
+      </ol>
+    </li>
+  </ul>
+</div>
+
+<h2>5 · OnboardingVehicle</h2>
+<div class="step-card">
+  <h3>Page State:</h3>
+  <ul><li><code>selectedVehicle</code> — String — <code>""</code></li></ul>
+  <h3>Mostrar opciones condicionalmente:</h3>
+  <ul>
+    <li>Contenedor <strong>Delivery Vehicles</strong>: Visible si <code>appState.userType == "delivery"</code> — opciones: bicycle, ebike, motorcycle, car</li>
+    <li>Contenedor <strong>Rideshare Vehicles</strong>: Visible si <code>appState.userType == "rideshare"</code> — opciones: motorcycle, car</li>
+  </ul>
+  <h3>Al seleccionar vehículo:</h3>
+  <ul>
+    <li>Update Page State <code>selectedVehicle</code> = "motorcycle" (etc.)</li>
+    <li>Cambiar borde/color con Conditional Value</li>
+  </ul>
+  <h3>Botón CONTINUAR:</h3>
+  <ul>
+    <li>Enabled: <code>selectedVehicle != ""</code></li>
+    <li>On Tap → Update App State <code>vehicleType = selectedVehicle</code> → Set costos predeterminados según vehículo (ver tabla abajo) → Navigate to <code>OnboardingConfig</code></li>
+  </ul>
+  <h3>Costos predeterminados por vehículo:</h3>
+  <ul>
+    <li>ebike → <code>1.00</code> / <code>0.40</code></li>
+    <li>motorcycle → <code>1.50</code> / <code>0.50</code></li>
+    <li>car → <code>3.00</code> / <code>0.80</code></li>
+  </ul>
+</div>
+
+<h2>6 · OnboardingConfig</h2>
+<div class="step-card">
+  <h3>Campos:</h3>
+  <ul>
+    <li>3× TextField con tipo <strong>Number</strong>, con valor inicial desde App State</li>
+    <li>Guardar en Page State local mientras el usuario edita</li>
+  </ul>
+  <h3>Botón EMPEZAR:</h3>
+  <ul>
+    <li>Update App State: <code>onboardingDone = true</code></li>
+    <li>Navigate to <code>MainApp</code> (reemplazar stack)</li>
+  </ul>
+</div>
+
+<h2>7 · MainApp — Calculadora</h2>
+<div class="step-card">
+  <h3>Page State variables:</h3>
+  <ul>
+    <li><code>payment</code> Double</li>
+    <li><code>km</code> Double</li>
+    <li><code>minutes</code> Double</li>
+    <li><code>travelCost</code> Double</li>
+    <li><code>realProfit</code> Double</li>
+    <li><code>profitPerHour</code> Double</li>
+    <li><code>showResult</code> Boolean = false</li>
+    <li><code>verdictColor</code> String = ""</li>
+    <li><code>verdictText</code> String = ""</li>
+  </ul>
+  <h3>Botón CALCULAR — On Tap Actions:</h3>
+  <p>Usar <strong>Custom Action</strong> NO disponible → usar <strong>Update Page State</strong> con fórmulas:</p>
+  <ul>
+    <li><code>realProfit = payment - travelCost</code></li>
+    <li><code>profitPerHour = realProfit / (minutes / 60)</code></li>
+    <li>Condicional para verdictText:
+      <ul>
+        <li>IF <code>profitPerHour > 200</code> → <code>"Excelente pedido — ACEPTAR"</code> + color verde</li>
+        <li>ELSE IF <code>profitPerHour >= 120</code> → <code>"Pedido aceptable"</code> + color amarillo</li>
+        <li>ELSE → <code>"No conviene — RECHAZAR"</code> + color rojo</li>
+      </ul>
+    </li>
+    <li><code>showResult = true</code></li>
+    <li>Guardar en <code>orderHistory</code> via <strong>Add to List</strong></li>
+  </ul>
+  <h3>Resultado — Conditional Visibility:</h3>
+  <ul>
+    <li>Widget de resultado: visible si <code>showResult == true</code></li>
+    <li>Color del container: Conditional Value según <code>verdictColor</code></li>
+  </ul>
+</div>
+
+<h2>8 · Historial</h2>
+<div class="step-card">
+  <ul>
+    <li>Usar <strong>ListView</strong> con <code>appState.orderHistory</code> como fuente</li>
+    <li>Cada item muestra: payment, km, minutes, realProfit, profitPerHour, verdictText</li>
+    <li>Color del indicador: Conditional Value según verdict guardado</li>
+  </ul>
+</div>
+
+<h2>9 · Fórmulas en FlutterFlow</h2>
+<div class="step-card">
+  <p>Usar <strong>Set From Variable → Combine Text / Math Expression</strong>:</p>
+  <ul>
+    <li>En FF, las fórmulas se configuran campo por campo en el panel de Actions</li>
+    <li>Para multiplicación: usar el campo <strong>Math</strong> en Update Page State</li>
+    <li>Alternativamente: crear una <strong>Custom Function</strong> (no custom code de pago) con Dart simple en el editor de funciones gratuito de FF</li>
+  </ul>
+  <div style="background:rgba(79,127,255,0.08);border-radius:8px;padding:12px;margin-top:8px">
+    <code>// Custom Function (gratis en FF)<br>
+    double calculateProfit(double p, double km, double min, double cpkm, double cpmin) {'{}'}<br>
+    &nbsp;&nbsp;double cost = (km * cpkm) + (min * cpmin);<br>
+    &nbsp;&nbsp;return p - cost;<br>
+    {'}'}</code>
+  </div>
+</div>
+
+<h2>10 · Checklist de implementación</h2>
+<div class="step-card">
+  <ul>
+    <li><span class="tag">1</span> Crear App State con todas las variables (Persisted ✓)</li>
+    <li><span class="tag">2</span> Crear página SplashRouter con condicional on load</li>
+    <li><span class="tag">3</span> OnboardingDriverType con 2 cards seleccionables</li>
+    <li><span class="tag">4</span> OnboardingVehicle con visibility condicional por userType</li>
+    <li><span class="tag">5</span> OnboardingConfig con TextFields y valores predeterminados</li>
+    <li><span class="tag">6</span> MainApp con BottomNav (3 tabs: Calcular, Historial, Config)</li>
+    <li><span class="tag">7</span> Calculadora con 3 inputs + botón + resultado condicional</li>
+    <li><span class="tag">8</span> Custom Functions para cálculos</li>
+    <li><span class="tag">9</span> ListView para historial con orderHistory list</li>
+    <li><span class="tag">10</span> Settings tab que actualiza App State</li>
+  </ul>
+</div>
+
+</div><!-- ff-doc -->
+
+<script>
+// ── State ──
+const APP = {
+  userType: '', vehicleType: '', vehicleLabel: '',
+  costPerKm: 2.5, minProfitPerHour: 120,
+  rendimiento: null, gasolinaPrice: null,
+  onboardingDone: false,
+  incentiveActive: false,
+  maxDistance: 0,
+  incentiveBonus: 0,
+  incentiveOrders: 0,
+  incentivePerOrder: 0,
+  sessionActive: false,
+  sessionStartTime: null,
+};
+let orderHistory = [];
+let currentStep = 1;
+
+const VEHICLES = {
+  delivery: [
+    { id: 'bicycle',  icon: '🚲', name: 'Bicicleta',       cpkm: 0.5,  cpm: 0.3 },
+    { id: 'ebike',    icon: '⚡', name: 'Bici eléctrica',  cpkm: 1.0,  cpm: 0.4 },
+    { id: 'motorcycle', icon: '🛵', name: 'Moto',          cpkm: 1.5,  cpm: 0.5 },
+    { id: 'car',      icon: '🚗', name: 'Auto',            cpkm: 3.0,  cpm: 0.8 },
+  ],
+  rideshare: [
+    { id: 'motorcycle', icon: '🛵', name: 'Moto',          cpkm: 1.5,  cpm: 0.5 },
+    { id: 'car',      icon: '🚗', name: 'Auto',            cpkm: 3.0,  cpm: 0.8 },
+  ],
+};
+
+const VERDICT = {
+  green:  { bg: 'linear-gradient(135deg,#062614,#0a3d1e)', accent: '#12f579', border: 'rgba(18,245,121,0.4)', glow: '0 0 32px rgba(18,245,121,0.2)', icon: '✓', label: 'ACEPTAR', sub: 'Excelente pedido' },
+  yellow: { bg: 'linear-gradient(135deg,#241c04,#3a2e08)',  accent: '#fbbf24', border: 'rgba(251,191,36,0.4)',  glow: '0 0 32px rgba(251,191,36,0.15)', icon: '~', label: 'EVALÚA',  sub: 'Pedido aceptable' },
+  red:    { bg: 'linear-gradient(135deg,#200808,#360d0d)',   accent: '#f94040', border: 'rgba(249,64,64,0.4)',   glow: '0 0 32px rgba(249,64,64,0.15)',  icon: '✕', label: 'RECHAZAR', sub: 'No conviene' },
+};
+
+let selectedDriver = '';
+let selectedVehicle = '';
+
+function updateStateDisplay() {
+  const el = document.getElementById('state-display');
+  if (!el) return; // panel was removed
+  const fields = [
+    ['userType', APP.userType || '—'],
+    ['vehicleType', APP.vehicleLabel || '—'],
+    ['incentivo', APP.incentiveBonus > 0 ? (APP.incentiveActive ? '🎯 +$' + APP.incentivePerOrder + '/pedido' : 'OFF') : '—'],
+    ['costPerKm', APP.costPerKm ? '$' + APP.costPerKm + (APP.rendimiento ? ' (' + APP.rendimiento + 'km/L)' : '') : '—'],
+    ['minProfitPerHour', APP.minProfitPerHour ? '$' + APP.minProfitPerHour : '—'],
+    ['onboardingDone', APP.onboardingDone ? 'true' : 'false'],
+    ['orderHistory', orderHistory.length + ' items'],
+  ];
+  el.innerHTML = fields.map(([k,v]) => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+      <span style="color:rgba(238,242,255,0.4)">${k}</span>
+      <span style="color:${v === '—' ? 'rgba(238,242,255,0.2)' : '#7fa8ff'};font-weight:600">${v}</span>
+    </div>
+  `).join('');
+}
+
+function setScreen(id) {
+  // Hide ALL screens first, then show only the target
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active', 'exit'));
+  document.getElementById(id).classList.add('active');
+}
+
+function updateProgress(step) {
+  const pb = document.getElementById('progress-bar');
+  const stepNum = step === 2.5 ? 2 : (step > 2.5 ? step : step - 1);
+  // Map: step1=0, step2=1, step2.5=2, step3=3
+  const idx = step === 1 ? 0 : step === 2 ? 1 : step === 2.5 ? 2 : 3;
+  if (step >= 1 && step <= 3) {
+    pb.style.display = 'flex';
+    for (let i = 0; i < 4; i++) {
+      const dot = document.getElementById('pd' + i);
+      if (!dot) continue;
+      if (i < idx) { dot.className = 'progress-dot done'; }
+      else if (i === idx) { dot.className = 'progress-dot active'; }
+      else { dot.className = 'progress-dot'; }
+    }
+  } else {
+    pb.style.display = 'none';
+  }
+}
+
+function selectDriver(type) {
+  const suggestedMin = type === 'rideshare' ? '120' : '80';
+  const mphField = document.getElementById('s3-mph');
+  if (mphField) {
+    mphField.placeholder = suggestedMin;
+    mphField.value = '';
+  }
+  // Update hint text
+  const hint = document.getElementById('mph-hint');
+  if (hint) {
+    hint.textContent = type === 'rideshare'
+      ? 'Conductores de pasajeros: ~$120/h recomendado'
+      : 'Repartidores: ~$80/h recomendado';
+  }
+  selectedDriver = type;
+  document.getElementById('opt-delivery').classList.toggle('selected', type === 'delivery');
+  document.getElementById('opt-rideshare').classList.toggle('selected', type === 'rideshare');
+  document.getElementById('chk-delivery').textContent = type === 'delivery' ? '✓' : '';
+  document.getElementById('chk-rideshare').textContent = type === 'rideshare' ? '✓' : '';
+  setTimeout(() => goTo(2), 400);
+}
+
+function buildVehicleList() {
+  const vlist = VEHICLES[selectedDriver] || [];
+  const el = document.getElementById('vehicle-list');
+  el.innerHTML = vlist.map(v => `
+    <div class="vehicle-card" id="vc-${v.id}" onclick="selectVehicle('${v.id}','${v.name}',${v.cpkm},${v.cpm})">
+      <span class="vc-icon">${v.icon}</span>
+      <span class="vc-name">${v.name}</span>
+      <div class="vc-dot" id="vd-${v.id}"></div>
+    </div>
+  `).join('');
+  document.getElementById('s2-title').textContent = selectedDriver === 'delivery'
+    ? '¿Qué vehículo usas para repartir?'
+    : '¿Qué vehículo usas para transportar?';
+}
+
+function selectVehicle(id, name, cpkm, cpm) {
+  try {
+  selectedVehicle = id;
+  document.querySelectorAll('.vehicle-card').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('[id^=vd-]').forEach(d => { d.style.background = ''; d.style.borderColor = ''; });
+  document.getElementById('vc-' + id).classList.add('selected');
+  APP.vehicleLabel = name;
+  const NON_FUEL = ['bicycle', 'ebike'];
+  const isFuel = !NON_FUEL.includes(id);
+  // Toggle fuel vs manual fields
+  document.getElementById('s3-fuel-fields').style.display   = isFuel ? '' : 'none';
+  document.getElementById('s3-manual-cpkm').style.display   = isFuel ? 'none' : '';
+  const defaults = { motorcycle:{rend:30,gas:22}, car:{rend:12,gas:22} };
+  const def = defaults[id];
+  if (isFuel && def) {
+    document.getElementById('s3-rendimiento').value = def.rend;
+    document.getElementById('s3-gasolina').value    = def.gas;
+    const calc = (def.gas / def.rend).toFixed(2);
+    document.getElementById('s3-cpkm').value = calc;
+    APP.costPerKm = parseFloat(calc);
+    APP.rendimiento = def.rend; APP.gasolinaPrice = def.gas;
+  } else {
+    APP.costPerKm = 0;
+    APP.rendimiento = null; APP.gasolinaPrice = null;
+  }
+  document.getElementById('s3-mph').value   = APP.minProfitPerHour;
+  updateStateDisplay();
+  setTimeout(() => goTo(2.5), 400);
+  } catch(e) {
+    console.error('selectVehicle error:', e);
+    setScreen('s25');
+  }
+}
+
+function goTo(step) {
+  currentStep = step;
+  updateProgress(step);
+  if (step === 0)    setScreen('s0');
+  else if (step === 0.5) setScreen('s05');
+  else if (step === 1)   setScreen('s1');
+  else if (step === 2)   { buildVehicleList(); setScreen('s2'); }
+  else if (step === 2.5) { resetS25(); setScreen('s25'); }
+  else if (step === 3)   setScreen('s3');
+}
+
+function resetS25() {
+  // Reset incentive screen to neutral state
+  document.getElementById('inc-yes').classList.remove('selected');
+  document.getElementById('inc-no').classList.remove('selected');
+  document.getElementById('chk-inc-yes').textContent = '';
+  document.getElementById('chk-inc-no').textContent  = '';
+  document.getElementById('s25-fields').style.display = 'none';
+  document.getElementById('s25-preview').style.display = 'none';
+  // Pre-select based on existing state if returning
+  if (APP.incentiveBonus > 0) selectIncentive(true, true);
+}
+
+function selectIncentive(hasIncentive, silent) {
+  document.getElementById('inc-yes').classList.toggle('selected', hasIncentive);
+  document.getElementById('inc-no').classList.toggle('selected', !hasIncentive);
+  document.getElementById('chk-inc-yes').textContent = hasIncentive ? '✓' : '';
+  document.getElementById('chk-inc-no').textContent  = !hasIncentive ? '✓' : '';
+  document.getElementById('s25-fields').style.display = hasIncentive ? 'flex' : 'none';
+  if (!hasIncentive) {
+    APP.incentiveActive   = false;
+    APP.incentiveBonus    = 0;
+    APP.incentiveOrders   = 0;
+    APP.incentivePerOrder = 0;
+  }
+  if (!silent) {
+    // If NO selected, auto-advance after short delay
+    if (!hasIncentive) {
+      setTimeout(() => goTo(3), 400);
+    } else {
+      // Pre-fill if returning
+      if (APP.incentiveBonus)  document.getElementById('s25-bonus').value  = APP.incentiveBonus;
+      if (APP.incentiveOrders) document.getElementById('s25-orders').value = APP.incentiveOrders;
+      updateS25Preview();
+    }
+  }
+}
+
+function updateS25Preview() {
+  const bonus  = parseFloat(document.getElementById('s25-bonus').value);
+  const orders = parseFloat(document.getElementById('s25-orders').value);
+  const preview = document.getElementById('s25-preview');
+  if (bonus && orders && orders > 0) {
+    const perOrder = (bonus / orders).toFixed(1);
+    document.getElementById('s25-per-order').textContent = '$' + perOrder + ' extra';
+    preview.style.display = 'flex';
+    APP.incentiveBonus    = bonus;
+    APP.incentiveOrders   = orders;
+    APP.incentivePerOrder = parseFloat(perOrder);
+    APP.incentiveActive   = true;
+    document.getElementById('btn-s25-continue').style.display = 'block';
+  } else {
+    preview.style.display = 'none';
+    document.getElementById('btn-s25-continue').style.display = 'none';
+  }
+}
+
+function goToOptionalConfig() {
+  setScreen('s3b');
+  // Pre-fill values
+  const mph = document.getElementById('s3b-mph');
+  if (mph) mph.placeholder = APP.userType === 'rideshare' ? '120' : '80';
+  const cpkm = document.getElementById('s3b-cpkm');
+  if (cpkm && APP.costPerKm) cpkm.value = APP.costPerKm;
+}
+
+function finishOnboardingFull() {
+  // Apply optional config values
+  const mph = parseFloat(document.getElementById('s3b-mph').value);
+  const maxDist = parseFloat(document.getElementById('s3b-maxdist').value);
+  const cpkm = parseFloat(document.getElementById('s3b-cpkm').value);
+  if (mph > 0) APP.minProfitPerHour = mph;
+  if (maxDist > 0) APP.maxDistance = maxDist;
+  if (cpkm > 0) APP.costPerKm = cpkm;
+  finishOnboarding();
+}
+
+function finishOnboarding() {
+  APP.userType = selectedDriver;
+  APP.vehicleType = selectedVehicle;
+  const NON_FUEL = ['bicycle', 'ebike'];
+  if (!NON_FUEL.includes(APP.vehicleType)) {
+    const rend = parseFloat(document.getElementById('s3-rendimiento').value);
+    const gas  = parseFloat(document.getElementById('s3-gasolina').value);
+    if (rend && gas) {
+      APP.costPerKm = parseFloat((gas / rend).toFixed(3));
+      APP.rendimiento = rend;
+      APP.gasolinaPrice = gas;
+    }
+  } else {
+    APP.costPerKm = 0;
+    APP.rendimiento = null;
+    APP.gasolinaPrice = null;
+  }
+  // Smart default minimum based on driver type
+  const defaultMinimums = {
+    delivery:  80,   // Repartidores
+    rideshare: 120   // Conductores de pasajeros
+  };
+  const userEnteredMin = parseFloat(document.getElementById('s3-mph').value);
+  if (userEnteredMin && userEnteredMin > 0) {
+    APP.minProfitPerHour = userEnteredMin;
+  } else {
+    APP.minProfitPerHour = defaultMinimums[APP.userType] || 90;
+  }
+  APP.onboardingDone = true;
+  updateStateDisplay();
+  saveToStorage();
+
+  // Show main app
+  document.getElementById('bottom-nav-wrap').style.display = 'flex';
+  updateProgress(99);
+  showMain('calc');
+}
+
+function showMain(tab) {
+  // Remove active from ALL screens — onboarding and main
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active', 'exit'));
+  document.querySelectorAll('.bn-btn').forEach(b => b.classList.remove('active'));
+
+  const screenId = 's-' + tab;
+  document.getElementById(screenId).classList.add('active');
+  if (tab === 'session') refreshSessionScreen();
+  if (tab === 'calc') setTimeout(initPlatformBar, 50);
+  const mapping = { calc: 'bn-calc', session: 'bn-session', history: 'bn-hist', settings: 'bn-cfg' };
+  if (mapping[tab]) document.getElementById(mapping[tab]).classList.add('active');
+
+  // Update header info
+  document.getElementById('ch-vehicle').textContent = APP.vehicleLabel || 'Auto';
+  document.getElementById('ch-cpkm').textContent    = '$' + APP.costPerKm;
+  // Restore incentive bar state
+  updateIncentiveBar();
+  // Update payment label based on driver type
+  const payLabel = document.getElementById('payment-label');
+  if (payLabel) payLabel.textContent = APP.userType === 'rideshare' ? 'PAGO DEL VIAJE' : 'PAGO DEL PEDIDO';
+  // Show/hide mic bar based on tab
+  const vbar = document.getElementById('voice-bar');
+  if (vbar) vbar.style.display = (tab === 'calc') ? 'block' : 'none';
+  // Show/hide fuel vs non-fuel header
+  const NON_FUEL = ['bicycle', 'ebike'];
+  const isNonFuel = NON_FUEL.includes(APP.vehicleType);
+  const fuelHdr   = document.getElementById('fuel-header');
+  const nofuelHdr = document.getElementById('nofuel-header');
+  if (fuelHdr)   fuelHdr.style.display   = isNonFuel ? 'none' : 'flex';
+  if (nofuelHdr) {
+    nofuelHdr.style.display = isNonFuel ? 'flex' : 'none';
+    document.getElementById('ch-vehicle-nf').textContent = APP.vehicleLabel || 'Bicicleta';
+  }
+
+  if (tab === 'history') renderHistory();
+  if (tab === 'settings') loadSettings();
+}
+
+function recalcCpkm(prefix) {
+  const rend = parseFloat(document.getElementById(prefix + '-rendimiento').value);
+  const gas  = parseFloat(document.getElementById(prefix + '-gasolina').value);
+  const cpkmEl = document.getElementById(prefix + '-cpkm');
+  if (rend && gas && rend > 0) {
+    const result = (gas / rend).toFixed(2);
+    cpkmEl.value = result;
+    cpkmEl.style.color = 'var(--green)';
+  } else {
+    cpkmEl.value = '';
+    cpkmEl.style.color = 'var(--accent)';
+  }
+}
+
+let _calcTimer = null;
+let _minUserEdited = false;  // true if user manually typed minutes
+
+function onKmInput() {
+  const km = parseFloat(document.getElementById('c-km').value);
+  const minField = document.getElementById('c-min');
+  const minBadge = document.getElementById('min-estimated');
+  // If user hasn't manually set minutes, estimate at 3 min/km
+  if (!_minUserEdited && km > 0) {
+    const minsPerKm = currentPlatform === 'rappi' ? 3.5 : 3;
+    const estimated = Math.round(km * minsPerKm);
+    minField.value = estimated;
+    minField.style.color = 'var(--accent)';
+    if (minBadge) minBadge.style.display = 'inline';
+  } else if (!_minUserEdited && !km) {
+    minField.value = '';
+    minField.style.color = '';
+    if (minBadge) minBadge.style.display = 'none';
+  }
+  autoCalc();
+}
+
+function onMinInput() {
+  const minField = document.getElementById('c-min');
+  const minBadge = document.getElementById('min-estimated');
+  // Mark as user-edited, remove estimation styling
+  _minUserEdited = minField.value !== '';
+  minField.style.color = _minUserEdited ? '' : 'var(--accent)';
+  if (minBadge) minBadge.style.display = _minUserEdited ? 'none' : 'inline';
+  autoCalc();
+}
+
+
+
+function autoCalc() {
+  const p = document.getElementById('c-payment').value;
+  const k = document.getElementById('c-km').value;
+  const m = document.getElementById('c-min').value;
+
+  // Update indicator immediately
+  const ind = document.getElementById('calc-indicator');
+  ind.style.opacity = '1';
+  document.getElementById('ci-pay').style.color  = p ? '#4f7fff' : 'rgba(238,242,255,0.3)';
+  document.getElementById('ci-km').style.color   = k ? '#4f7fff' : 'rgba(238,242,255,0.3)';
+  document.getElementById('ci-min').style.color  = m ? '#4f7fff' : 'rgba(238,242,255,0.3)';
+  document.getElementById('ci-pay').textContent  = p ? '$ ' + p : '$ —';
+  document.getElementById('ci-km').textContent   = k ? 'km ' + k : 'km —';
+  document.getElementById('ci-min').textContent  = m ? 'min ' + m : 'min —';
+
+  // Wait 800ms after user stops typing before calculating
+  if (_calcTimer) clearTimeout(_calcTimer);
+  if (p && k && m) {
+    _calcTimer = setTimeout(() => doCalculate(), 800);
+  }
+}
+
+function doCalculate() {
+  if (!incrementUsage()) {
+    showPaywall();
+    return;
+  }
+  const payment  = parseFloat(document.getElementById('c-payment').value);
+  const km       = parseFloat(document.getElementById('c-km').value);
+  const minutes  = parseFloat(document.getElementById('c-min').value);
+
+  // Don't calculate if missing key fields
+  // For Rappi/DiDi Food, auto-estimate minutes from km if missing
+  let effectiveMinutes = minutes;
+  if (!minutes && km > 0 && (currentPlatform === 'rappi' || currentPlatform === 'didi')) {
+    effectiveMinutes = Math.round(km * 3.5);
+    document.getElementById('c-min').value = effectiveMinutes;
+  }
+  if (!payment || !effectiveMinutes || !km) {
+    showVoiceStatus('⚠ Faltan datos: pago y kilómetros', '#f94040');
+    return;
+  }
+  if (minutes < 1) return;
+  const impliedSpeed = (km / minutes) * 60;
+  if (impliedSpeed > 150) {
+    document.getElementById('ci-pay').textContent = '⚠ Revisa km o min';
+    document.getElementById('ci-pay').style.color = '#f94040';
+    document.getElementById('calc-indicator').style.opacity = '1';
+    return;
+  }
+
+  const travelCost      = km * APP.costPerKm;
+  // Count today's accepted orders to check incentive completion
+  const todayStr = new Date().toDateString();
+  const todayOrders = orderHistory.filter(o => new Date(o.time).toDateString() === todayStr).length;
+  const incentiveCompleted = APP.incentiveOrders > 0 && todayOrders >= APP.incentiveOrders;
+  const incentiveBonus = (APP.incentiveActive && APP.incentivePerOrder > 0 && !incentiveCompleted)
+    ? APP.incentivePerOrder : 0;
+  
+  // Show incentive status
+  const incBar = document.getElementById('incentive-bar');
+  if (incBar && APP.incentiveActive && APP.incentiveOrders > 0) {
+    const remaining = Math.max(0, APP.incentiveOrders - todayOrders);
+    if (incentiveCompleted) {
+      incBar.querySelector('span') && (incBar.querySelector('span').textContent = '✅ Incentivo completado');
+    } else {
+      incBar.querySelector('span') && (incBar.querySelector('span').textContent = 
+        '+$' + fmt(APP.incentivePerOrder) + ' por pedido · faltan ' + remaining + ' para completar');
+    }
+  }
+  const effectivePayment = payment + incentiveBonus;
+  const realProfit      = effectivePayment - travelCost;
+  const profitPerHour   = (realProfit / minutes) * 60;
+
+  // Adaptive decision engine
+  try {
+    const now = Date.now();
+    const tiempoSinPedidos = (now - _lastOrderTime) / 60000;
+    _ordersThisHour = _ordersThisHour.filter(t => now - t < 3600000);
+    const pedidosPorHora = _ordersThisHour.length;
+
+    const decision = DecisionEngine.decidir(
+      effectivePayment, minutes, km,
+      pedidosPorHora, tiempoSinPedidos,
+      APP.incentiveActive
+    );
+
+    _lastOrderTime = now;
+    _ordersThisHour.push(now);
+
+    // Update demand badge
+    const demandBadge = document.getElementById('demand-badge');
+    if (demandBadge) {
+      const demandColor = { alta: '#dc2626', media: '#d97706', baja: '#059652' };
+      const demandLabel = { alta: '🔥 Demanda alta', media: '📊 Demanda media', baja: '🌙 Demanda baja' };
+      demandBadge.textContent = demandLabel[decision.demanda] + '  ·  umbral $' + decision.umbral + '/min';
+      demandBadge.style.color = demandColor[decision.demanda];
+      demandBadge.style.display = 'block';
+    }
+  } catch(e) {
+    console.error('Decision engine error:', e);
+  }
+
+  // Use exact minimum configured by user — no automatic adjustment
+  const efectiveMinimum = APP.minProfitPerHour;
+  const greenThreshold  = efectiveMinimum * 1.3;
+
+  let score;
+  if (profitPerHour >= greenThreshold)       score = 'green';
+  else if (profitPerHour >= efectiveMinimum) score = 'yellow';
+  else {
+    // Regla secundaria: casi llega al piso y distancia corta
+    if (profitPerHour >= efectiveMinimum * 0.9 && km <= 6) {
+      score = 'yellow';
+    } else {
+      score = 'red';
+    }
+  }
+
+  const vc = VERDICT[score];
+  const card = document.getElementById('result-card');
+  card.style.background = vc.bg;
+  card.style.border = `2px solid ${vc.border}`;
+  card.style.boxShadow = vc.glow;
+
+  document.getElementById('rv-verdict').textContent = vc.label;
+  document.getElementById('rv-verdict').style.color = vc.accent;
+  document.getElementById('rv-sub').textContent     = vc.sub;
+  document.getElementById('rv-profit').textContent  = '$' + fmt(realProfit);
+  document.getElementById('rv-profit').style.color  = vc.accent;
+  document.getElementById('rv-ph').textContent      = '$' + fmt(profitPerHour) + '/h';
+  document.getElementById('rv-ph').title = 'Incluye ~5 min de espera/recolección';
+  document.getElementById('rv-ph').style.color      = vc.accent;
+  // rv-cost hidden — user doesn't need to see cost per km
+  document.getElementById('rv-pay').textContent     = incentiveBonus > 0
+    ? '$' + fmt(payment) + '+$' + incentiveBonus.toFixed(0)
+    : '$' + fmt(payment);
+  document.getElementById('rv-pkm').textContent     = '$' + fmt((realProfit / km), 1);
+
+  orderHistory.unshift({ payment, km, minutes, travelCost, realProfit, profitPerHour, score, verdict: vc.label, time: Date.now() });
+  updateStateDisplay();
+  saveToStorage();
+
+  // Speak result
+  try { speakResult(score, Math.round(realProfit), Math.round(profitPerHour)); } catch(e) {}
+
+  // Save anonymous data to Firebase
+  try {
+    if (window.saveToFirebase) {
+      const lastLoc = GPSDetector.historialUbicaciones.length > 0
+        ? GPSDetector.historialUbicaciones[GPSDetector.historialUbicaciones.length-1]
+        : null;
+      window.saveToFirebase({
+        pago: payment,
+        minutos: minutes,
+        km: km,
+        ganancia: Math.round(realProfit),
+        gananciaHora: Math.round(profitPerHour),
+        decision: score,
+        plataforma: currentPlatform || 'unknown',
+        tipoConductor: APP.userType,
+        vehiculo: APP.vehicleType,
+        lat: lastLoc ? lastLoc.lat : null,
+        lon: lastLoc ? lastLoc.lon : null
+      });
+    }
+  } catch(e) { console.log('Firebase error:', e); }
+
+  setScreen('s-result', 's-calc');
+  document.getElementById('bn-calc').classList.add('active');
+}
+
+function newOrder() {
+  _minUserEdited = false;
+  document.getElementById('c-payment').value = '';
+  document.getElementById('c-km').value = '';
+  document.getElementById('c-min').value = '';
+  document.getElementById('ci-pay').textContent = '$ —';
+  document.getElementById('ci-km').textContent = 'km —';
+  document.getElementById('ci-min').textContent = 'min —';
+  document.getElementById('ci-pay').style.color = 'rgba(238,242,255,0.3)';
+  document.getElementById('ci-km').style.color = 'rgba(238,242,255,0.3)';
+  document.getElementById('ci-min').style.color = 'rgba(238,242,255,0.3)';
+  document.getElementById('calc-indicator').style.opacity = '0';
+  setScreen('s-calc', 's-result');
+  document.getElementById('bn-calc').classList.add('active');
+}
+
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  document.getElementById('h-total').textContent = orderHistory.length;
+  const totalEarn = orderHistory.reduce((s, o) => s + o.realProfit, 0);
+  document.getElementById('h-earn').textContent = '$' + fmt(totalEarn);
+  document.getElementById('h-acc').textContent  = orderHistory.filter(o => o.score === 'green').length;
+
+  if (!orderHistory.length) {
+    list.innerHTML = `<div style="text-align:center;padding:40px 0;color:rgba(238,242,255,0.25);font-family:'Inconsolata',monospace;font-size:13px"><div style="font-size:36px;margin-bottom:12px">📋</div>Aún no hay pedidos calculados.</div>`;
+    return;
+  }
+
+  list.innerHTML = orderHistory.map(o => {
+    const vc = VERDICT[o.score];
+    return `
+      <div class="history-item" style="border-color:${vc.border}">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="color:${vc.accent};font-size:16px">${vc.icon}</span>
+          <div class="hi-info">
+            <div class="hi-main">$${o.payment}</div>
+            <div class="hi-meta">${o.km}km · ${o.minutes}min</div>
+          </div>
+        </div>
+        <div class="hi-right">
+          <div class="hi-profit" style="color:${vc.accent}">$${fmt(o.realProfit, 0)}</div>
+          <div class="hi-ph">$${fmt(o.profitPerHour, 0)}/h</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function changeVehicle() {
+  // Go back to vehicle selection keeping userType, hiding bottom nav
+  APP.onboardingDone = false;
+  document.getElementById('bottom-nav-wrap').style.display = 'none';
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active','exit'));
+  // Pre-select the current driver type
+  if (APP.userType) {
+    selectedDriver = APP.userType;
+    document.getElementById('opt-delivery').classList.toggle('selected', APP.userType === 'delivery');
+    document.getElementById('opt-rideshare').classList.toggle('selected', APP.userType === 'rideshare');
+    document.getElementById('chk-delivery').textContent  = APP.userType === 'delivery'  ? '✓' : '';
+    document.getElementById('chk-rideshare').textContent = APP.userType === 'rideshare' ? '✓' : '';
+    
+  }
+  selectedVehicle = '';
+  buildVehicleList();
+  updateProgress(2);
+  document.getElementById('s2').classList.add('active');
+  updateStateDisplay();
+}
+
+function loadSettings() {
+  if (APP.rendimiento) document.getElementById('cfg-rendimiento').value = APP.rendimiento;
+  if (APP.gasolinaPrice) document.getElementById('cfg-gasolina').value = APP.gasolinaPrice;
+  document.getElementById('cfg-cpkm').value  = APP.costPerKm;
+  document.getElementById('cfg-mph').value   = APP.minProfitPerHour;
+  document.getElementById('cfg-type-label').textContent = APP.userType === 'delivery' ? 'Repartidor' : 'Conductor de pasajeros';
+  document.getElementById('cfg-veh-label').textContent  = APP.vehicleLabel || '—';
+  const icons = { bicycle:'🚲', ebike:'⚡', motorcycle:'🛵', car:'🚗' };
+  document.getElementById('cfg-veh-icon').textContent   = icons[APP.vehicleType] || '🚗';
+  document.getElementById('cfg-cpkm-display').textContent = APP.costPerKm ? '$' + APP.costPerKm : '$—';
+  saveToStorage();
+  // Show/hide fuel fields in settings
+  const NON_FUEL = ['bicycle', 'ebike'];
+  const isFuel = !NON_FUEL.includes(APP.vehicleType);
+  document.getElementById('cfg-fuel-fields').style.display   = isFuel ? '' : 'none';
+  document.getElementById('cfg-manual-cpkm').style.display   = isFuel ? 'none' : '';
+  // non-fuel: nothing to pre-fill
+}
+
+function saveSettings() {
+  const NON_FUEL = ['bicycle', 'ebike'];
+  if (!NON_FUEL.includes(APP.vehicleType)) {
+    const cfgRend = parseFloat(document.getElementById('cfg-rendimiento').value);
+    const cfgGas  = parseFloat(document.getElementById('cfg-gasolina').value);
+    if (cfgRend && cfgGas) {
+      APP.costPerKm = parseFloat((cfgGas / cfgRend).toFixed(3));
+      APP.rendimiento = cfgRend; APP.gasolinaPrice = cfgGas;
+      document.getElementById('cfg-cpkm').value = APP.costPerKm;
+    }
+  } else {
+    APP.costPerKm = 0;
+    APP.rendimiento = null; APP.gasolinaPrice = null;
+  }
+  APP.minProfitPerHour = parseFloat(document.getElementById('cfg-mph').value)   || APP.minProfitPerHour;
+  updateStateDisplay();
+  document.getElementById('ch-cpkm').textContent  = '$' + APP.costPerKm;
+  const btn = document.getElementById('save-btn');
+  btn.textContent = '✓ GUARDADO';
+  btn.style.background = 'linear-gradient(135deg,#0a4a25,#12f579)';
+  btn.style.color = '#001a0a';
+  setTimeout(() => { btn.textContent = 'GUARDAR CAMBIOS'; btn.style.background = ''; btn.style.color = ''; }, 1500);
+
+  // Clear calculator fields so new settings apply fresh
+  document.getElementById('c-payment').value = '';
+  document.getElementById('c-km').value = '';
+  document.getElementById('c-min').value = '';
+}
+
+function resetOnboarding() {
+  APP.onboardingDone = false;
+  selectedDriver = ''; selectedVehicle = '';
+  document.getElementById('bottom-nav-wrap').style.display = 'none';
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active','exit'));
+  document.getElementById('opt-delivery').classList.remove('selected');
+  document.getElementById('opt-rideshare').classList.remove('selected');
+  document.getElementById('chk-delivery').textContent = '';
+  document.getElementById('chk-rideshare').textContent = '';
+
+  // Clear calculator fields
+  document.getElementById('c-payment').value = '';
+  document.getElementById('c-km').value = '';
+  document.getElementById('c-min').value = '';
+
+  // Hide result screen
+  const result = document.getElementById('s-result');
+  if (result) result.classList.remove('active');
+
+  goTo(0);
+  updateStateDisplay();
+}
+
+// ── Voice input ──
+let voiceRecognition = null;
+let voiceActive = false;
+
+function toggleVoice() {
+  // If on result screen, go back to calc and clear fields first
+  if (document.getElementById('s-result') && 
+      document.getElementById('s-result').classList.contains('active')) {
+    document.getElementById('c-payment').value = '';
+    document.getElementById('c-km').value = '';
+    document.getElementById('c-min').value = '';
+    showMain('calc');
+    setTimeout(() => startVoice(), 300);
+    return;
+  }
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    showVoiceStatus('⚠ Tu navegador no soporta voz. Usa Chrome o Safari.', '#f94040');
+    return;
+  }
+  if (voiceActive) {
+    stopVoice();
+  } else {
+    startVoice();
+  }
+}
+
+function startVoice() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  voiceRecognition = new SpeechRecognition();
+  voiceRecognition.lang = 'es-MX';
+  voiceRecognition.continuous = false;
+  voiceRecognition.interimResults = true;
+
+  voiceRecognition.onstart = () => {
+    voiceActive = true;
+    document.getElementById('mic-btn').style.background = '#f94040';
+    document.getElementById('mic-btn').style.boxShadow = '0 4px 20px rgba(249,64,64,0.6)';
+    document.getElementById('mic-btn').style.transform = 'scale(1.1)';
+    document.getElementById('mic-icon').textContent = '⏹';
+    document.getElementById('mic-text').textContent = 'ESCUCHANDO...';
+    showVoiceStatus('🎙️ Habla ahora: "110 pesos, 20 minutos, 5.7 km"', '#4f7fff');
+  };
+
+  voiceRecognition.onresult = (e) => {
+    const transcript = Array.from(e.results).map(r => r[0].transcript).join(' ');
+    if (e.results[e.results.length - 1].isFinal) {
+      showVoiceStatus('✓ Entendí: ' + transcript, '#12f579');
+      parseVoiceInput(transcript);
+      stopVoice();
+    } else {
+      showVoiceStatus('⋯ ' + transcript, '#4f7fff');
+    }
+  };
+
+  voiceRecognition.onerror = (e) => {
+    showVoiceStatus('⚠ Error: ' + e.error + '. Intenta de nuevo.', '#f94040');
+    stopVoice();
+  };
+
+  voiceRecognition.onend = () => stopVoice();
+  voiceRecognition.start();
+}
+
+function stopVoice() {
+  voiceActive = false;
+  if (voiceRecognition) { try { voiceRecognition.stop(); } catch(e){} }
+  document.getElementById('mic-btn').style.background = '#25D366';
+  document.getElementById('mic-btn').style.boxShadow = '0 4px 20px rgba(37,211,102,0.4)';
+  document.getElementById('mic-btn').style.transform = 'scale(1)';
+  document.getElementById('mic-icon').textContent = '🎙️';
+  document.getElementById('mic-text').textContent = 'DICTAR PEDIDO';
+}
+
+function showVoiceStatus(msg, color) {
+  const el = document.getElementById('voice-status');
+  el.style.display = 'block';
+  el.style.color = color || '#4f7fff';
+  el.style.borderColor = (color || '#4f7fff').replace(')', ',0.2)').replace('rgb', 'rgba');
+  el.textContent = msg;
+  if (color === '#12f579') setTimeout(() => { el.style.display = 'none'; }, 3000);
+}
+
+function parseVoiceInput(text) {
+  console.log('Voice raw:', text);
+
+  // STEP 1: Extract ALL numbers from raw text in order (most reliable)
+  const rawNums = [...text.matchAll(/\d+(?:[.,]\d+)?/g)]
+    .map(m => parseFloat(m[0].replace(',','.')));
+  console.log('Raw nums:', rawNums);
+
+  // STEP 2: If we have 3+ numbers, assign by position directly
+  if (rawNums.length === 1) {
+    // Only got 1 number — fill payment and ask for more
+    const el = document.getElementById('c-payment');
+    el.value = rawNums[0]; el.dispatchEvent(new Event('input', {bubbles:true}));
+    showVoiceStatus('✓ $' + rawNums[0] + ' · Ahora di los minutos y kilómetros', '#fbbf24');
+    return;
+  }
+  if (rawNums.length === 2) {
+    const isDeliveryNoMin = currentPlatform === 'rappi' || currentPlatform === 'didi';
+    if (isDeliveryNoMin) {
+      // Rappi/DiDi Food: 2 numbers = pago + km (no minutes available)
+      const elP = document.getElementById('c-payment');
+      const elK = document.getElementById('c-km');
+      elP.value = rawNums[0]; elP.dispatchEvent(new Event('input', {bubbles:true}));
+      elK.value = rawNums[1]; elK.dispatchEvent(new Event('input', {bubbles:true}));
+      // Auto-estimate minutes
+      const estMin = Math.round(rawNums[1] * 3.5);
+      document.getElementById('c-min').value = estMin;
+      document.getElementById('c-min').dispatchEvent(new Event('input', {bubbles:true}));
+      showVoiceStatus('✓ $' + rawNums[0] + ' · ' + rawNums[1] + 'km · ' + estMin + 'min estimado', '#12f579');
+      setTimeout(() => doCalculate(), 900);
+    } else {
+      // Uber/UberEats: 2 numbers = pago + minutos, ask for km
+      document.getElementById('c-payment').value = rawNums[0];
+      document.getElementById('c-payment').dispatchEvent(new Event('input', {bubbles:true}));
+      document.getElementById('c-min').value = rawNums[1];
+      document.getElementById('c-min').dispatchEvent(new Event('input', {bubbles:true}));
+      showVoiceStatus('✓ $' + rawNums[0] + ' · ' + rawNums[1] + 'min · Ahora di los kilómetros', '#fbbf24');
+    }
+    return;
+  }
+  if (rawNums.length >= 3) {
+    const payment = rawNums[0];
+    const minutes = rawNums[1];
+    const km      = rawNums[2];
+
+    console.log('Positional → pay:', payment, 'min:', minutes, 'km:', km);
+
+    const elP = document.getElementById('c-payment');
+    const elM = document.getElementById('c-min');
+    const elK = document.getElementById('c-km');
+
+    elP.value = payment; elP.dispatchEvent(new Event('input', {bubbles:true}));
+    elM.value = minutes; elM.dispatchEvent(new Event('input', {bubbles:true}));
+    elK.value = km;      elK.dispatchEvent(new Event('input', {bubbles:true}));
+
+    showVoiceStatus('✓ $' + payment + ' · ' + minutes + 'min · ' + km + 'km', '#12f579');
+    setTimeout(() => doCalculate(), 900);
+    return;
+  }
+
+  // STEP 3: If only 2 numbers, try keyword matching
+  let t = text.toLowerCase()
+    .replace(/,/g, ' ').replace(/\./g, ' ')
+    .replace(/\by\b/g, ' ').replace(/\bcon\b/g, ' ');
+
+  // Normalize km variations that Safari might produce
+  t = t
+    .replace(/ki\s*l[oó]?\s*me\s*tros?/g, 'kilómetros')
+    .replace(/kil\s*ó\s*me\s*tros?/g, 'kilómetros')
+    .replace(/k\s*m\s*s?/g, 'km')
+    .replace(/k\s*i\s*l\s*o\s*s?/g, 'km');
+
+  // spoken numbers → digits
+  const numMap = [
+    [/ciento\s*/g,'100 '],[/\bcien\b/g,'100'],
+    [/noventa/g,'90'],[/ochenta/g,'80'],[/setenta/g,'70'],[/sesenta/g,'60'],
+    [/cincuenta/g,'50'],[/cuarenta/g,'40'],[/treinta/g,'30'],
+    [/veintinueve/g,'29'],[/veintiocho/g,'28'],[/veintisiete/g,'27'],
+    [/veintis[eé]is/g,'26'],[/veinticinco/g,'25'],[/veinticuatro/g,'24'],
+    [/veintitr[eé]s/g,'23'],[/veintid[oó]s/g,'22'],[/veintiuno/g,'21'],
+    [/veinte/g,'20'],[/diecinueve/g,'19'],[/dieciocho/g,'18'],
+    [/diecisiete/g,'17'],[/dieci[sS][eé]is/g,'16'],[/quince/g,'15'],
+    [/catorce/g,'14'],[/trece/g,'13'],[/doce/g,'12'],[/once/g,'11'],
+    [/\bdiez\b/g,'10'],[/\bnueve\b/g,'9'],[/\bocho\b/g,'8'],[/\bsiete\b/g,'7'],
+    [/\bseis\b/g,'6'],[/\bcinco\b/g,'5'],[/\bcuatro\b/g,'4'],[/\btres\b/g,'3'],
+    [/\bdos\b/g,'2'],[/\bun[oa]?\b/g,'1'],[/\bcero\b/g,'0']
+  ];
+  for (const [re, val] of numMap) t = t.replace(re, val);
+
+  // Collapse "100 10" → 110
+  t = t.replace(/(\d+)\s+(\d+)/g, (_, a, b) => {
+    const A = parseInt(a), B = parseInt(b);
+    if (A >= 100 && B < 100) return String(A + B);
+    return a + ' ' + b;
+  });
+
+  const allNums = [...t.matchAll(/\d+(?:\.\d+)?/g)].map(m => parseFloat(m[0]));
+
+  let payment = null, minutes = null, km = null;
+
+  const payM  = t.match(/(\d+(?:\.\d+)?)\s*(?:pesos?|mxn)/);
+  const minM  = t.match(/(\d+(?:\.\d+)?)\s*(?:minutos?|mins?\b)/);
+  const kmM   = t.match(/(\d+(?:\.\d+)?)\s*(?:kil[oóo]?[oó]?metros?|kil[oó]metros?|kil[oó]m?etros?|\bkms?\b|\bkilos?\b|\bkil\b)/);
+  const payM2 = t.match(/(?:pesos?|mxn)\s*(\d+(?:\.\d+)?)/);
+  const minM2 = t.match(/(?:minutos?|mins?)\s*(\d+(?:\.\d+)?)/);
+  const kmM2  = t.match(/(?:kil[oóo]?[oó]?metros?|kil[oó]metros?|\bkms?\b|\bkilos?\b|\bkil\b)\s*(\d+(?:\.\d+)?)/);
+
+  if (payM) payment = parseFloat(payM[1]); else if (payM2) payment = parseFloat(payM2[1]);
+  if (minM) minutes = parseFloat(minM[1]); else if (minM2) minutes = parseFloat(minM2[1]);
+  if (kmM)  km      = parseFloat(kmM[1]);  else if (kmM2)  km      = parseFloat(kmM2[1]);
+
+  // Fill remaining from positional
+  if (payment === null && allNums[0] !== undefined) payment = allNums[0];
+  if (minutes === null && allNums[1] !== undefined) minutes = allNums[1];
+  if (km === null      && allNums[2] !== undefined) km      = allNums[2];
+
+  console.log('Final → pay:', payment, 'min:', minutes, 'km:', km);
+
+  let filled = [];
+  if (payment !== null) {
+    const el = document.getElementById('c-payment');
+    el.value = payment; el.dispatchEvent(new Event('input', {bubbles:true}));
+    filled.push('$' + payment);
+  }
+  if (minutes !== null) {
+    const el = document.getElementById('c-min');
+    el.value = minutes; el.dispatchEvent(new Event('input', {bubbles:true}));
+    filled.push(minutes + 'min');
+  }
+  if (km !== null) {
+    const el = document.getElementById('c-km');
+    el.value = km; el.dispatchEvent(new Event('input', {bubbles:true}));
+    filled.push(km + 'km');
+  }
+
+  if (filled.length > 0) {
+    showVoiceStatus('✓ ' + filled.join(' · '), '#12f579');
+    setTimeout(() => doCalculate(), 900);
+  } else {
+    showVoiceStatus('⚠ Di: "110 pesos 20 minutos 4 kilómetros"', '#f94040');
+  }
+}
+
+
+// ── Incentive logic ──
+function showIncentiveModal() {
+  const modal = document.getElementById('incentive-modal');
+  modal.style.display = 'flex';
+  document.getElementById('modal-bonus').value  = APP.incentiveBonus  || '';
+  document.getElementById('modal-orders').value = APP.incentiveOrders || '';
+  updateIncentivePreview();
+}
+
+function closeIncentiveModal() {
+  document.getElementById('incentive-modal').style.display = 'none';
+}
+
+function updateIncentivePreview() {
+  const bonus  = parseFloat(document.getElementById('modal-bonus').value);
+  const orders = parseFloat(document.getElementById('modal-orders').value);
+  const preview = document.getElementById('incentive-preview');
+  const applyBtn = document.getElementById('apply-incentive-btn');
+  if (bonus && orders && orders > 0) {
+    const perOrder = (bonus / orders).toFixed(1);
+    document.getElementById('preview-per-order').textContent = '$' + perOrder + ' extra';
+    preview.style.display = 'flex';
+    applyBtn.disabled = false;
+    applyBtn.style.opacity = '1';
+  } else {
+    preview.style.display = 'none';
+    applyBtn.disabled = true;
+    applyBtn.style.opacity = '0.4';
+  }
+}
+
+function applyIncentive() {
+  const bonus  = parseFloat(document.getElementById('modal-bonus').value);
+  const orders = parseFloat(document.getElementById('modal-orders').value);
+  APP.incentiveBonus    = bonus;
+  APP.incentiveOrders   = orders;
+  APP.incentivePerOrder = parseFloat((bonus / orders).toFixed(2));
+  APP.incentiveActive   = true;
+  closeIncentiveModal();
+  updateIncentiveBar();
+  saveToStorage();
+}
+
+function toggleIncentive() {
+  APP.incentiveActive = !APP.incentiveActive;
+  updateIncentiveBar();
+  saveToStorage();
+}
+
+function updateIncentiveBar() {
+  const bar    = document.getElementById('incentive-bar');
+  const addBtn = document.getElementById('incentive-add-btn');
+  const togBtn = document.getElementById('incentive-toggle-btn');
+  const label  = document.getElementById('incentive-label');
+  if (APP.incentiveBonus > 0) {
+    bar.style.display    = 'flex';
+    addBtn.style.display = 'none';
+    label.textContent    = '+$' + APP.incentivePerOrder + ' por pedido (bono $' + APP.incentiveBonus + '/' + APP.incentiveOrders + ')';
+    togBtn.textContent   = APP.incentiveActive ? '✓ ON' : '○ OFF';
+    togBtn.style.color   = APP.incentiveActive ? '#fbbf24' : 'rgba(255,255,255,0.3)';
+    bar.style.opacity    = APP.incentiveActive ? '1' : '0.4';
+  } else {
+    bar.style.display    = 'none';
+    addBtn.style.display = 'block';
+  }
+}
+
+// ── Week Bar Chart ──
+function drawWeekChart() {
+  const chart = document.getElementById('week-chart');
+  if (!chart) return;
+
+  // Build earnings per day for last 7 days (Mon–Sun of current week)
+  const now = new Date();
+  const dayOfWeek = now.getDay(); // 0=Sun,1=Mon,...6=Sat
+  // todayIdx in Mon-based array: Mon=0,...,Sun=6
+  const todayIdxCalc = (dayOfWeek + 6) % 7;
+  // Get Monday of this week (local time)
+  const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  monday.setDate(monday.getDate() - todayIdxCalc);
+
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    days.push(d);
+  }
+
+  // Sum earnings per day from orderHistory
+  const dayEarnings = days.map(d => {
+    const dStr = d.toDateString();
+    return orderHistory
+      .filter(t => new Date(t.time).toDateString() === dStr)
+      .reduce((s, t) => s + t.realProfit, 0);
+  });
+
+  // Also include saved sessions earnings
+  const sessions = loadSessions();
+  days.forEach((d, i) => {
+    // Use local date string yyyy-mm-dd to avoid UTC offset bugs
+    const yr  = d.getFullYear();
+    const mo  = String(d.getMonth()+1).padStart(2,'0');
+    const day = String(d.getDate()).padStart(2,'0');
+    const dStr = yr + '-' + mo + '-' + day;
+    const sessEarnings = sessions
+      .filter(s => s.date === dStr)
+      .reduce((s, sess) => s + (sess.earnings || 0), 0);
+    if (sessEarnings > dayEarnings[i]) dayEarnings[i] = sessEarnings;
+  });
+
+  const maxVal = Math.max(...dayEarnings, 1);
+  const todayIdx = todayIdxCalc;
+
+  // chartHeight in px — bars use px not % so they actually fill the container
+  const chartH = 130;
+  chart.style.height = chartH + 'px';
+
+  // Get today's local date string for direct comparison
+  const todayStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+
+  console.log('TODAY STR:', todayStr);
+  const dbg = document.getElementById('chart-debug');
+  if (dbg) dbg.textContent = 'hoy: ' + todayStr + ' (día ' + now.getDay() + ')';
+  days.forEach((d,i) => {
+    const ds = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    console.log('day['+i+']:', ds, ds===todayStr ? '<-- TODAY' : '', 'earnings:', dayEarnings[i]);
+  });
+
+  chart.innerHTML = days.map((d, i) => {
+    const val = dayEarnings[i];
+    const barH = val > 0 ? Math.max(Math.round((val / maxVal) * chartH), 14) : 3;
+    const dStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    const isToday = dStr === todayStr;
+    const hasVal  = val > 0;
+    const color   = isToday ? 'var(--accent)' : hasVal ? 'var(--green)' : 'var(--dim)';
+    const label   = hasVal ? '$' + fmt(val) : '';
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px">
+      ${hasVal ? `<div style="font-size:8px;color:${color};font-family:'Inconsolata',monospace;font-weight:700;white-space:nowrap;text-align:center">${label}</div>` : ''}
+      <div style="width:85%;background:${color};border-radius:5px 5px 2px 2px;height:${barH}px;transition:height 0.5s cubic-bezier(0.34,1.56,0.64,1)"></div>
+    </div>`;
+  }).join('');
+}
+
+// ── Freemium System ──
+const FREE_LIMIT = 8;
+
+function getUsageData() {
+  try {
+    const raw = localStorage.getItem('vr_usage');
+    if (!raw) return { count: 0, date: todayKey(), premium: false };
+    return JSON.parse(raw);
+  } catch(e) { return { count: 0, date: todayKey(), premium: false }; }
+}
+
+function todayKey() {
+  const n = new Date();
+  return n.getFullYear() + '-' + String(n.getMonth()+1).padStart(2,'0') + '-' + String(n.getDate()).padStart(2,'0');
+}
+
+function saveUsage(data) {
+  localStorage.setItem('vr_usage', JSON.stringify(data));
+}
+
+function isPremium() {
+  const d = getUsageData();
+  return d.premium === true;
+}
+
+function getRemainingQueries() {
+  const d = getUsageData();
+  if (d.premium) return 999;
+  // Reset if new day
+  if (d.date !== todayKey()) return FREE_LIMIT;
+  return Math.max(0, FREE_LIMIT - (d.count || 0));
+}
+
+function incrementUsage() {
+  let d = getUsageData();
+  if (d.premium) return true; // always allowed
+  if (d.date !== todayKey()) {
+    d = { count: 0, date: todayKey(), premium: false };
+  }
+  if (d.count >= FREE_LIMIT) return false; // blocked
+  d.count++;
+  saveUsage(d);
+  updateQueryCounter();
+  return true;
+}
+
+function updateQueryCounter() {
+  const rem = getRemainingQueries();
+  const el = document.getElementById('query-counter');
+  if (!el) return;
+  if (isPremium()) {
+    el.innerHTML = '⭐ PREMIUM';
+    el.style.color = '#fbbf24';
+  } else {
+    el.innerHTML = rem + ' consultas gratis hoy';
+    el.style.color = rem <= 3 ? 'var(--red)' : 'var(--muted)';
+  }
+}
+
+function showPaywall() {
+  document.getElementById('s-paywall').style.display = 'flex';
+  document.getElementById('bottom-nav-wrap').style.display = 'none';
+}
+
+function closePaywall() {
+  document.getElementById('s-paywall').style.display = 'none';
+  document.getElementById('bottom-nav-wrap').style.display = 'flex';
+  showMain('calc');
+}
+
+function activatePremium(plan) {
+  // In production this verifies Play Store receipt
+  let d = getUsageData();
+  d.premium = true;
+  d.plan = plan || 'monthly';
+  saveUsage(d);
+  updateQueryCounter();
+
+  // Hide paywall, restore nav
+  document.getElementById('s-paywall').style.display = 'none';
+  document.getElementById('bottom-nav-wrap').style.display = 'flex';
+
+  // Clear calculator fields for fresh start
+  document.getElementById('c-payment').value = '';
+  document.getElementById('c-km').value = '';
+  document.getElementById('c-min').value = '';
+
+  // Go to calc
+  showMain('calc');
+
+  const planLabel = plan === 'annual' ? 'Anual $25/mes' : 'Mensual $35';
+  showToast('⭐ Premium activado · ' + planLabel);
+}
+
+function showToast(msg) {
+  let toast = document.getElementById('vr-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'vr-toast';
+    toast.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#12f579;color:#000;padding:12px 24px;border-radius:30px;font-family:Inconsolata,monospace;font-size:13px;font-weight:700;z-index:9999;opacity:0;transition:opacity 0.3s;white-space:nowrap';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.style.opacity = '1';
+  setTimeout(() => { toast.style.opacity = '0'; }, 3000);
+}
+
+// ── Platform Mode ──
+let currentPlatform = localStorage.getItem('dp_platform') || 'uber';
+
+function setPlatform(p) {
+  currentPlatform = p;
+  localStorage.setItem('dp_platform', p);
+
+  // Update button styles
+  ['uber','didi','indriver','rappi','ubereats'].forEach(id => {
+    const btn = document.getElementById('plat-' + id);
+    if (!btn) return;
+    const active = id === p;
+    btn.style.background    = active ? 'var(--accent)' : 'var(--surface2)';
+    btn.style.color         = active ? '#fff' : 'var(--muted)';
+    btn.style.borderColor   = active ? 'var(--accent)' : 'var(--border)';
+  });
+
+  // For Rappi/DiDi Food: hide minutes field, show auto-estimate note
+  const minGroup = document.getElementById('min-field-group');
+  const minNote  = document.getElementById('min-auto-note');
+
+  if (p === 'rappi' || p === 'didi') { // delivery platforms without minutes
+    // Auto-estimate minutes from km
+    if (minGroup) minGroup.style.opacity = '0.5';
+    if (minNote) minNote.style.display = 'block';
+    // Recalculate estimate
+    const km = parseFloat(document.getElementById('c-km').value);
+    if (km > 0) {
+      const est = Math.round(km * 3.5);
+      document.getElementById('c-min').value = est;
+      document.getElementById('c-min').dispatchEvent(new Event('input', {bubbles:true}));
+    }
+  } else {
+    if (minGroup) minGroup.style.opacity = '1';
+    if (minNote) minNote.style.display = 'none';
+  }
+}
+
+function initPlatformBar() {
+  const bar = document.getElementById('platform-bar');
+  if (!bar) return;
+
+  const platforms = APP.userType === 'delivery'
+    ? [
+        { id: 'rappi',    label: 'Rappi/DiDi Food' },
+        { id: 'ubereats', label: 'Uber Eats' },
+      ]
+    : [
+        { id: 'uber',     label: 'Uber' },
+        { id: 'didi',     label: 'DiDi' },
+        { id: 'indriver', label: 'InDriver' },
+      ];
+
+  bar.innerHTML = platforms.map(p => `
+    <button onclick="setPlatform('${p.id}')" id="plat-${p.id}"
+      style="flex:1;padding:6px 4px;border-radius:8px;border:1px solid var(--border);
+      background:var(--surface2);color:var(--muted);font-size:10px;
+      font-family:'Inconsolata',monospace;cursor:pointer;transition:all 0.2s">
+      ${p.label}
+    </button>`).join('');
+
+  // Set default platform
+  const defaultPlatform = APP.userType === 'delivery' ? 'rappi' : 'uber';
+  setPlatform(localStorage.getItem('dp_platform') || defaultPlatform);
+}
+
+// ── Text-to-Speech (habla el resultado) ──
+function speakResult(verdict, profit, perHour) {
+  if (!window.speechSynthesis) return;
+
+  const text = verdict === 'green'  ? 'Acepta. ' + profit + ' pesos. ' + perHour + ' por hora.' :
+               verdict === 'yellow' ? 'Evalúa. ' + profit + ' pesos. ' + perHour + ' por hora.' :
+                                      'Rechaza. ' + profit + ' pesos de ganancia.';
+
+  function doSpeak() {
+    window.speechSynthesis.cancel();
+    const msg = new SpeechSynthesisUtterance(text);
+    msg.lang = 'es-MX';
+    msg.rate = 1.0;
+    msg.pitch = 1.0;
+  msg.volume = 1.0;
+
+  // Try to use a Spanish voice
+  const voices = window.speechSynthesis.getVoices();
+  const spanishVoice = voices.find(v => v.lang.startsWith('es'));
+  if (spanishVoice) msg.voice = spanishVoice;
+
+  window.speechSynthesis.speak(msg);
+    // iOS keep-alive: resume if paused
+    const keepAlive = setInterval(() => {
+      if (!window.speechSynthesis.speaking) { clearInterval(keepAlive); return; }
+      if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+    }, 100);
+    msg.onend = () => clearInterval(keepAlive);
+  }
+
+  // Retry up to 3 times if not speaking after 500ms
+  let attempts = 0;
+  function trySpeak() {
+    attempts++;
+    doSpeak();
+    setTimeout(() => {
+      if (!window.speechSynthesis.speaking && attempts < 3) trySpeak();
+    }, 600);
+  }
+
+  // Small delay to let audio context settle after voice recognition
+  setTimeout(trySpeak, 300);
+}
+
+// ── Wake Word Listener ──
+let wakeWordActive = false;
+let wakeRecognition = null;
+
+function startWakeWord() {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) return;
+  if (wakeWordActive) return;
+
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  wakeRecognition = new SR();
+  wakeRecognition.lang = 'es-MX';
+  wakeRecognition.continuous = true;
+  wakeRecognition.interimResults = false;
+
+  wakeRecognition.onresult = (e) => {
+    const transcript = e.results[e.results.length - 1][0].transcript.toLowerCase().trim();
+    console.log('Wake word heard:', transcript);
+
+    // Wake words: "calcular", "viaje", "pedido", "rentable"
+    const wakeWords = ['calcular', 'calcula', 'viaje', 'pedido', 'rentable', 'analiza'];
+    const isWake = wakeWords.some(w => transcript.includes(w));
+
+    if (isWake && !voiceActive) {
+      // Stop wake word listener
+      wakeRecognition.stop();
+      wakeWordActive = false;
+      // Speak confirmation
+      const ack = new SpeechSynthesisUtterance('Listo, habla');
+      ack.lang = 'es-MX'; ack.rate = 1.2;
+      window.speechSynthesis.speak(ack);
+      // Start main voice input after short delay
+      setTimeout(() => {
+        if (document.getElementById('s-calc').classList.contains('active')) {
+          startVoice();
+        } else {
+          showMain('calc');
+          setTimeout(startVoice, 300);
+        }
+      }, 800);
+    }
+  };
+
+  wakeRecognition.onend = () => {
+    wakeWordActive = false;
+    // Restart if app is in foreground
+    if (document.visibilityState !== 'hidden') {
+      setTimeout(startWakeWord, 1000);
+    }
+  };
+
+  wakeRecognition.onerror = (e) => {
+    wakeWordActive = false;
+    if (e.error !== 'aborted') setTimeout(startWakeWord, 3000);
+  };
+
+  try {
+    wakeRecognition.start();
+    wakeWordActive = true;
+    console.log('Wake word listener started');
+  } catch(e) {
+    console.log('Wake word error:', e);
+  }
+}
+
+function stopWakeWord() {
+  if (wakeRecognition) { wakeRecognition.stop(); wakeRecognition = null; }
+  wakeWordActive = false;
+}
+
+// ── GPS Demand Detector ──
+const GPSDetector = {
+  historialUbicaciones: [],  // [{lat, lon, ts}]
+  historialEstados: [],
+  estadoDemanda: 'normal',
+  watchId: null,
+  ventanaMs: 7 * 60 * 1000,   // 7 minutos
+  umbralMetros: 100,
+  intervaloMs: 30000,          // lectura cada 30s si en movimiento
+  intervaloQuietoMs: 60000,    // lectura cada 60s si quieto
+
+  haversine(lat1, lon1, lat2, lon2) {
+    const R = 6371000;
+    const toRad = x => x * Math.PI / 180;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a = Math.sin(dLat/2)**2 +
+              Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+              Math.sin(dLon/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  },
+
+  agregarUbicacion(lat, lon) {
+    const ts = Date.now();
+    this.historialUbicaciones.push({lat, lon, ts});
+    // Limpiar lecturas fuera de ventana
+    const limite = ts - this.ventanaMs;
+    this.historialUbicaciones = this.historialUbicaciones.filter(p => p.ts >= limite);
+  },
+
+  distanciaTotal() {
+    const pts = this.historialUbicaciones;
+    if (pts.length < 2) return 0;
+    let total = 0;
+    for (let i = 1; i < pts.length; i++) {
+      total += this.haversine(pts[i-1].lat, pts[i-1].lon, pts[i].lat, pts[i].lon);
+    }
+    return Math.round(total);
+  },
+
+  detectar(tiempoSinPedidos = 0) {
+    if (this.historialUbicaciones.length < 2) return this.estadoDemanda;
+
+    const distancia = this.distanciaTotal();
+    const estadoNuevo = (distancia < this.umbralMetros || tiempoSinPedidos > 7)
+      ? 'baja' : 'normal';
+
+    this.historialEstados.push(estadoNuevo);
+    if (this.historialEstados.length > 5) this.historialEstados.shift();
+
+    const votosBaja = this.historialEstados.filter(e => e === 'baja').length;
+    if (votosBaja >= 3)      this.estadoDemanda = 'baja';
+    else if (votosBaja <= 1) this.estadoDemanda = 'normal';
+    // Si votos == 2 mantiene estado anterior
+
+    this.actualizarBadgeGPS(distancia);
+    return this.estadoDemanda;
+  },
+
+  actualizarBadgeGPS(distancia) {
+    const el = document.getElementById('gps-badge');
+    if (!el) return;
+    const icons = { normal: '📍', baja: '🅿️' };
+    const labels = { normal: 'En movimiento', baja: 'Esperando pedidos' };
+    el.textContent = icons[this.estadoDemanda] + ' ' + labels[this.estadoDemanda] + ' · ' + distancia + 'm/7min';
+    el.style.color = this.estadoDemanda === 'baja' ? 'var(--yellow)' : 'var(--green)';
+    el.style.display = 'block';
+  },
+
+  iniciar() {
+    if (!navigator.geolocation) return;
+    // Pedir permiso y empezar a rastrear
+    const opts = { enableHighAccuracy: false, timeout: 10000, maximumAge: 30000 };
+    this.watchId = navigator.geolocation.watchPosition(
+      pos => {
+        this.agregarUbicacion(pos.coords.latitude, pos.coords.longitude);
+        // Ajustar frecuencia según movimiento
+        const distancia = this.distanciaTotal();
+        // watchPosition maneja el intervalo, solo registramos
+      },
+      err => console.log('GPS error:', err.code),
+      opts
+    );
+    console.log('GPS tracker started');
+  },
+
+  detener() {
+    if (this.watchId !== null) {
+      navigator.geolocation.clearWatch(this.watchId);
+      this.watchId = null;
+    }
+  }
+};
+
+// ── Adaptive Decision Engine ──
+const DecisionEngine = {
+  umbral: 2.2,
+  alpha: 0.15,
+  historialScores: [],
+
+  scoresDemanda(pedidosPorHora, tiempoSinPedidos, incentivoActivo) {
+    const ritmo     = Math.min(pedidosPorHora / 2.7, 1.5);
+    const espera    = 1 - Math.min(tiempoSinPedidos, 15) / 15;
+    const incentivo = incentivoActivo ? 1 : 0;
+    const score     = 0.5 * ritmo + 0.3 * espera + 0.2 * incentivo;
+
+    this.historialScores.push(score);
+    if (this.historialScores.length > 5) this.historialScores.shift();
+    const avg = this.historialScores.reduce((a,b) => a+b, 0) / this.historialScores.length;
+    return Math.round(avg * 1000) / 1000;
+  },
+
+  clasificarDemanda(score) {
+    if (score >= 0.65) return 'alta';
+    if (score >= 0.40) return 'media';
+    return 'baja';
+  },
+
+  actualizarUmbral(demanda) {
+    const objetivos = { alta: 2.5, media: 2.2, baja: 1.8 };
+    const objetivo  = objetivos[demanda];
+    this.umbral = this.umbral + this.alpha * (objetivo - this.umbral);
+    return Math.round(this.umbral * 1000) / 1000;
+  },
+
+  decidir(pReal, T, K, pedidosPorHora, tiempoSinPedidos, incentivoActivo) {
+    const R = T > 0 ? pReal / T : 0;
+
+    // Merge GPS demand with time-based demand
+    const gpsDemanda = GPSDetector.detectar(tiempoSinPedidos);
+    const score      = this.scoresDemanda(pedidosPorHora, tiempoSinPedidos, incentivoActivo);
+    let demanda      = this.clasificarDemanda(score);
+
+    // GPS overrides to baja if detector says so
+    if (gpsDemanda === 'baja' && demanda === 'normal') demanda = 'baja';
+
+    const umbral = this.actualizarUmbral(demanda);
+    let acepta   = R >= umbral;
+
+    // Reglas secundarias
+    if (!acepta) {
+      if (demanda === 'baja' && pReal >= 60 && T <= 35) acepta = true;
+      else if (demanda !== 'alta' && R >= umbral * 0.9 && K <= 5) acepta = true;
+    }
+
+    let colorScore;
+    if (acepta && R >= 2.5)  colorScore = 'green';
+    else if (acepta)          colorScore = 'yellow';
+    else                      colorScore = 'red';
+
+    return { acepta, R: Math.round(R*100)/100, umbral, demanda, score, colorScore };
+  }
+};
+
+// ── Number formatting ──
+function fmt(n, decimals=0) {
+  return Number(n).toLocaleString('es-MX', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}
+
+// ── Wake Word Toggle ──
+let wakeWordEnabled = localStorage.getItem('dp_wakeword') !== 'off';
+
+function toggleWakeWord() {
+  wakeWordEnabled = !wakeWordEnabled;
+  localStorage.setItem('dp_wakeword', wakeWordEnabled ? 'on' : 'off');
+  const btn = document.getElementById('wake-toggle-btn');
+  if (btn) {
+    btn.textContent = wakeWordEnabled ? 'ON' : 'OFF';
+    btn.style.background = wakeWordEnabled ? 'var(--accent)' : 'var(--surface2)';
+    btn.style.borderColor = wakeWordEnabled ? 'var(--accent)' : 'var(--border)';
+    btn.style.color = wakeWordEnabled ? '#fff' : 'var(--muted)';
+  }
+  if (wakeWordEnabled) startWakeWord();
+  else stopWakeWord();
+}
+
+// ── Theme System ──
+let themeMode = localStorage.getItem('dp_theme') || 'light';
+
+function applyTheme() {
+  let theme;
+  if (themeMode === 'light') theme = 'light';
+  else if (themeMode === 'dark') theme = 'dark';
+  else {
+    // AUTO: follow the device system preference (dark mode switch)
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    theme = prefersDark ? 'dark' : 'light';
+  }
+
+  document.documentElement.setAttribute('data-theme', theme === 'light' ? 'light' : '');
+
+  // Update label
+  const lbl = document.getElementById('theme-label');
+  if (lbl) lbl.textContent = theme === 'light' ? '☀️ Modo diurno' : '🌙 Modo nocturno';
+
+  // Highlight active button
+  ['auto','dark','light'].forEach(m => {
+    const btn = document.getElementById('tbtn-' + m);
+    if (!btn) return;
+    const active = m === themeMode;
+    btn.style.background = active ? 'var(--accent)' : 'var(--surface2)';
+    btn.style.color      = active ? '#fff' : 'var(--muted)';
+    btn.style.borderColor = active ? 'var(--accent)' : 'var(--border)';
+  });
+}
+
+function setTheme(mode) {
+  themeMode = mode;
+  localStorage.setItem('dp_theme', mode);
+  applyTheme();
+  updateQueryCounter();
+  setTimeout(initPlatformBar, 100);
+
+  // Unlock speech synthesis on iOS with silent utterance
+  document.addEventListener('touchstart', function unlockAudio() {
+    if (window.speechSynthesis) {
+      const u = new SpeechSynthesisUtterance('');
+      u.volume = 0;
+      window.speechSynthesis.speak(u);
+    }
+    document.removeEventListener('touchstart', unlockAudio);
+  }, { once: true });
+  // Start GPS passively
+  GPSDetector.iniciar();
+  // Start wake word listener
+  setTimeout(startWakeWord, 2000);
+}
+
+// Listen to system dark mode changes in real time
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+  if (themeMode === 'auto') applyTheme();
+});
+
+// ── Session Tracker ──
+let sessionInterval = null;
+
+const SESSION_KEY = 'driverprofit_sessions_v1';
+
+function loadSessions() {
+  try { return JSON.parse(localStorage.getItem(SESSION_KEY) || '[]'); } catch(e) { return []; }
+}
+function saveSessions(sessions) {
+  try { localStorage.setItem(SESSION_KEY, JSON.stringify(sessions)); } catch(e) {}
+}
+
+function startSession() {
+  GPSDetector.iniciar();
+  const now = new Date();
+  APP.sessionStartTime = now.getTime();
+  APP.sessionActive = true;
+  saveToStorage();
+  refreshSessionScreen();
+  startSessionTimer();
+}
+
+function endSession() {
+  GPSDetector.detener();
+  if (!APP.sessionActive) return;
+  const now = new Date();
+  const sessions = loadSessions();
+  const todayTrips = getTodayTrips();
+  const totalEarnings = todayTrips.reduce((s, t) => s + t.realProfit, 0);
+  const hoursWorked = (now.getTime() - APP.sessionStartTime) / 3600000;
+
+  sessions.push({
+    date: now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0'),
+    startTime: APP.sessionStartTime,
+    endTime: now.getTime(),
+    earnings: totalEarnings,
+    trips: todayTrips.length,
+    hoursWorked: hoursWorked
+  });
+  saveSessions(sessions);
+
+  APP.sessionActive = false;
+  APP.sessionStartTime = null;
+  saveToStorage();
+  if (sessionInterval) { clearInterval(sessionInterval); sessionInterval = null; }
+  refreshSessionScreen();
+}
+
+function startSessionTimer() {
+  if (sessionInterval) clearInterval(sessionInterval);
+  sessionInterval = setInterval(() => {
+    if (APP.sessionActive) updateSessionLiveKPIs();
+  }, 10000); // update every 10s
+  updateSessionLiveKPIs(); // immediate
+}
+
+function getTodayTrips() {
+  const today = new Date().toDateString();
+  return orderHistory.filter(t => new Date(t.time).toDateString() === today);
+}
+
+function getWeekTrips() {
+  const now = new Date();
+  const weekAgo = now.getTime() - 7 * 24 * 3600000;
+  return orderHistory.filter(t => t.time >= weekAgo);
+}
+
+function fmtDuration(ms) {
+  const totalMin = Math.floor(ms / 60000);
+  const h = Math.floor(totalMin / 60);
+  const m = totalMin % 60;
+  return h > 0 ? h + 'h ' + String(m).padStart(2,'0') + 'm' : m + 'm';
+}
+
+function updateSessionLiveKPIs() {
+  if (!APP.sessionActive || !APP.sessionStartTime) return;
+  const now = Date.now();
+  const elapsed = now - APP.sessionStartTime;
+  const hoursWorked = elapsed / 3600000;
+  const todayTrips = getTodayTrips();
+  const totalEarnings = todayTrips.reduce((s, t) => s + t.realProfit, 0);
+  const hourly = hoursWorked > 0 ? totalEarnings / hoursWorked : 0;
+  const avgPerTrip = todayTrips.length > 0 ? totalEarnings / todayTrips.length : 0;
+
+  document.getElementById('sess-elapsed').textContent  = fmtDuration(elapsed);
+  document.getElementById('sess-earnings').textContent = '$' + fmt(totalEarnings);
+  document.getElementById('sess-hourly').textContent   = '$' + fmt(hourly) + '/h';
+  document.getElementById('sess-trips').textContent    = todayTrips.length;
+  document.getElementById('sess-avg').textContent      = '$' + fmt(avgPerTrip);
+}
+
+function refreshSessionScreen() {
+  const hasSession = APP.sessionActive;
+  document.getElementById('no-session').style.display      = hasSession ? 'none' : 'block';
+  document.getElementById('active-session').style.display  = hasSession ? 'block' : 'none';
+
+  if (hasSession) {
+    const startDate = new Date(APP.sessionStartTime);
+    document.getElementById('sess-start-display').textContent =
+      startDate.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+    updateSessionLiveKPIs();
+    if (!sessionInterval) startSessionTimer();
+  }
+
+  // Daily summary from sessions
+  const sessions = loadSessions();
+  const todayStr = new Date().toISOString().split('T')[0];
+  const todaySessions = sessions.filter(s => s.date === todayStr);
+  const todayTrips = getTodayTrips();
+  const todayEarnings = todayTrips.reduce((s, t) => s + t.realProfit, 0);
+
+  // Add live session to daily if active
+  let totalDayMs = todaySessions.reduce((s, sess) => s + (sess.endTime - sess.startTime), 0);
+  if (hasSession) totalDayMs += Date.now() - APP.sessionStartTime;
+
+  const hasDayData = todaySessions.length > 0 || hasSession;
+  document.getElementById('daily-summary').style.display    = hasDayData ? 'block' : 'none';
+  document.getElementById('no-session-data').style.display  = hasDayData ? 'none' : 'block';
+
+  if (hasDayData) {
+    const dayHours = totalDayMs / 3600000;
+    const dayHourly = dayHours > 0 ? todayEarnings / dayHours : 0;
+    document.getElementById('ds-earned').textContent  = '$' + fmt(todayEarnings);
+    document.getElementById('ds-hours').textContent   = fmtDuration(totalDayMs);
+    document.getElementById('ds-hourly').textContent  = '$' + fmt(dayHourly) + '/h';
+    document.getElementById('ds-trips').textContent   = todayTrips.length;
+    document.getElementById('ds-earned').style.color  = 'var(--green)';
+  }
+
+  // Weekly summary
+  const weekAgo = new Date();
+  weekAgo.setDate(weekAgo.getDate() - 7);
+  weekAgo.setHours(0,0,0,0);
+  const weekSessions = sessions.filter(s => {
+    const [y,m,d] = s.date.split('-').map(Number);
+    return new Date(y, m-1, d) >= weekAgo;
+  });
+  const weekTrips = getWeekTrips();
+  const weekEarnings = weekTrips.reduce((s, t) => s + t.realProfit, 0);
+  let weekMs = weekSessions.reduce((s, sess) => s + (sess.endTime - sess.startTime), 0);
+  if (hasSession) weekMs += Date.now() - APP.sessionStartTime;
+
+  const hasWeekData = weekSessions.length > 0 || hasSession;
+  document.getElementById('weekly-summary').style.display = hasWeekData ? 'block' : 'none';
+  if (hasWeekData) {
+    const weekHours = weekMs / 3600000;
+    const weekHourly = weekHours > 0 ? weekEarnings / weekHours : 0;
+    document.getElementById('ws-earned').textContent  = '$' + fmt(weekEarnings);
+    document.getElementById('ws-hours').textContent   = fmtDuration(weekMs);
+    document.getElementById('ws-hourly').textContent  = '$' + fmt(weekHourly) + '/h';
+    document.getElementById('ws-trips').textContent   = weekTrips.length;
+    drawWeekChart();
+  }
+}
+
+// ── LocalStorage persistence ──
+const LS_KEY = 'driverprofit_v1';
+
+function saveToStorage() {
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      app: APP,
+      history: orderHistory,
+      selectedDriver,
+      selectedVehicle,
+    }));
+  } catch(e) {}
+}
+
+function loadFromStorage() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return false;
+    const saved = JSON.parse(raw);
+    if (saved.app) Object.assign(APP, saved.app);
+    if (saved.history) orderHistory = saved.history;
+    if (saved.selectedDriver) selectedDriver = saved.selectedDriver;
+    if (saved.selectedVehicle) selectedVehicle = saved.selectedVehicle;
+    return APP.onboardingDone;
+  } catch(e) { return false; }
+}
+
+function restoreSession() {
+  if (APP.sessionActive && APP.sessionStartTime) {
+    startSessionTimer();
+  }
+}
+
+// ── Init ──
+const alreadySetup = loadFromStorage();
+updateStateDisplay();
+
+applyTheme();
+
+if (alreadySetup) {
+  // Skip onboarding, go straight to app
+  document.getElementById('bottom-nav-wrap').style.display = 'flex';
+  document.getElementById('progress-bar').style.display = 'none';
+  showMain('calc');
+  restoreSession();
+} else {
+  goTo(0);
+}
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(() => console.log('SW registered'))
+      .catch(e => console.log('SW error', e));
+  });
+}
+</script>
+</body>
+</html>
