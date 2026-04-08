@@ -2,8 +2,7 @@
   "name": "Filtro Inteligente",
   "short_name": "Filtro Inteligente",
   "description": "Filtra tus viajes y pedidos al instante con inteligencia. Acepta solo los que valen la pena.",
-  "start_url": "/Filtro-Inteligente/",
-  "scope": "/Filtro-Inteligente/",
+  "start_url": "/index.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0c0e14",
@@ -32,7 +31,7 @@
     {
       "name": "Calcular viaje",
       "short_name": "Calcular",
-      "url": "/Filtro-Inteligente/",
+      "url": "/index.html",
       "icons": [
         {
           "src": "icon-192.png",
