@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.filtrointeligente.pro",
+    "sha256_cert_fingerprints": ["31:E2:35:06:FF:22:BE:F5:77:96:51:79:F1:14:0B:AF:71:22:4B:FB:FA:DF:67:C0:C2:69:DB:06:2C:24:AB:44"]
+  }
+}]
