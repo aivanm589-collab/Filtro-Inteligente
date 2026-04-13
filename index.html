@@ -859,6 +859,12 @@ body::before {
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Inconsolata:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
+<script>
+window.onerror = function(msg, src, line) {
+  document.body.innerHTML = '<div style="padding:20px;color:red;font-family:monospace;font-size:12px">JS Error: ' + msg + ' (line ' + line + ')</div>';
+  return false;
+};
+</script>
 
 <!-- ═══════════════════════════════════════ PHONE ═══════ -->
 <div class="phone-shell">
@@ -874,7 +880,7 @@ body::before {
   <div class="screen-wrap">
 
     <!-- ── STEP 0: Welcome ── -->
-    <div class="screen" id="s0">
+    <div class="screen active" id="s0">
       <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px 0">
         <div style="font-size:64px;margin-bottom:24px">🚀</div>
         <div style="font-size:28px;font-weight:900;font-family:'Inter',sans-serif;color:var(--text);margin-bottom:12px;line-height:1.2">Bienvenido a<br>Filtro Inteligente</div>
