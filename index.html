@@ -3487,6 +3487,11 @@ if (alreadySetup) {
 </script>
 <script>
 if ('serviceWorker' in navigator) {
+  // Clear all old caches first
+  navigator.serviceWorker.getRegistrations().then(regs => {
+    regs.forEach(reg => reg.unregister());
+  });
+  caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js')
       .then(() => console.log('SW registered'))
