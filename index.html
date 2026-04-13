@@ -904,23 +904,21 @@ body::before {
     </div>
 
     <!-- ── STEP 0.5: How to use ── -->
-    <div class="screen" id="s05">
-      <div style="flex:1;overflow-y:auto">
+    <div classid="s05">
+      <div style="flex:1;overflow-y:auto;display:flex;flex-direction:column">
         <div class="screen-label">CÓMO USAR LA APP</div>
         <div class="screen-title" style="font-size:22px">Así de fácil</div>
 
-        <!-- Important tip -->
-        <div style="background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.4);border-radius:14px;padding:14px 16px;margin-top:12px;margin-bottom:4px">
+        <div style="background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.4);border-radius:14px;padding:14px 16px;margin-top:12px;margin-bottom:16px">
           <div style="font-size:13px;font-weight:700;color:#d97706;margin-bottom:6px">⚠️ Antes de empezar</div>
           <div style="font-size:12px;color:var(--text);font-family:'Inconsolata',monospace;line-height:1.7">
             La app te pedirá definir tu <strong>ganancia mínima por hora</strong>.<br><br>
-            Esto es lo mínimo que quieres ganar trabajando. Si un pedido no llega a ese número, la app te dirá que lo rechaces.<br><br>
             💡 <strong>Repartidores:</strong> ~$80/h recomendado<br>
             💡 <strong>Conductores:</strong> ~$120/h recomendado
           </div>
         </div>
 
-        <div style="display:flex;flex-direction:column;gap:12px;margin-top:16px">
+        <div style="display:flex;flex-direction:column;gap:12px">
           <div style="background:var(--surface);border-radius:14px;padding:16px;display:flex;gap:14px;align-items:flex-start">
             <div style="background:var(--accent);color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0">1</div>
             <div><div style="font-weight:700;font-size:14px;margin-bottom:4px">Recibe un pedido o viaje</div>
@@ -928,19 +926,18 @@ body::before {
           </div>
           <div style="background:var(--surface);border-radius:14px;padding:16px;display:flex;gap:14px;align-items:flex-start">
             <div style="background:var(--accent);color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0">2</div>
-            <div><div style="font-weight:700;font-size:14px;margin-bottom:4px">Dicta o captura los datos</div>
-            <div style="font-size:12px;color:var(--muted);font-family:'Inconsolata',monospace">Di "85 pesos, 20 minutos, 4 km"<br>o escríbelos manualmente.</div></div>
+            <div><div style="font-weight:700;font-size:14px;margin-bottom:4px">Captura o dicta los datos</div>
+            <div style="font-size:12px;color:var(--muted);font-family:'Inconsolata',monospace">Toca el micrófono o escribe: pago, minutos y km.</div></div>
           </div>
           <div style="background:var(--surface);border-radius:14px;padding:16px;display:flex;gap:14px;align-items:flex-start">
             <div style="background:var(--green);color:#000;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0">3</div>
             <div><div style="font-weight:700;font-size:14px;margin-bottom:4px">Recibe la decisión al instante</div>
-            <div style="font-size:12px;color:var(--muted);font-family:'Inconsolata',monospace">ACEPTAR ✅ · EVALÚA ⚠️ · RECHAZAR ❌<br>La app habla el resultado en voz alta.</div></div>
-          </div>
-
+            <div style="font-size:12px;color:var(--muted);font-family:'Inconsolata',monospace">ACEPTAR ✅ · EVALÚA ⚠️ · RECHAZAR ❌</div></div>
           </div>
         </div>
+
+        <button class="btn-primary" onclick="goTo(1)" style="margin-top:24px">ENTENDIDO →</button>
       </div>
-      <button class="btn-primary" onclick="goTo(1)" style="margin-top:auto;margin-bottom:0">ENTENDIDO →</button>
     </div>
 
     <!-- ── STEP 1: Driver Type ── -->
