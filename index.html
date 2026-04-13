@@ -859,12 +859,7 @@ body::before {
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Inconsolata:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-<script>
-window.onerror = function(msg, src, line) {
-  document.body.innerHTML = '<div style="padding:20px;color:red;font-family:monospace;font-size:12px">JS Error: ' + msg + ' (line ' + line + ')</div>';
-  return false;
-};
-</script>
+
 
 <!-- ═══════════════════════════════════════ PHONE ═══════ -->
 <div class="phone-shell">
@@ -2986,7 +2981,7 @@ function speakResult(verdict, profit, perHour) {
 
 // ── Wake Word Listener ──
 let wakeWordActive = false;
-const wakeWordEnabled = false; // disabled permanently
+let wakeWordEnabled = false; // disabled permanently
 let wakeRecognition = null;
 
 function startWakeWord() {
