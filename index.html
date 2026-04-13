@@ -1427,7 +1427,7 @@ body::before {
       <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px">
         <div>
           <div style="font-size:12px;font-weight:700;margin-bottom:2px">🎙️ Escucha en segundo plano</div>
-          <div style="font-size:10px;color:var(--muted);font-family:'Inconsolata',monospace">Di "calcular" para activar sin tocar la app</div>
+          <div style="font-size:10px;color:var(--muted);font-family:'Inconsolata',monospace"></div>
         </div>
         <button id="wake-toggle-btn" onclick="toggleWakeWord()" style="padding:8px 14px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:#fff;font-size:11px;font-family:'Inconsolata',monospace;cursor:pointer">ON</button>
       </div>
@@ -2968,6 +2968,7 @@ function speakResult(verdict, profit, perHour) {
 
 // ── Wake Word Listener ──
 let wakeWordActive = false;
+const wakeWordEnabled = false; // disabled permanently
 let wakeRecognition = null;
 
 function startWakeWord() {
@@ -3195,7 +3196,7 @@ function fmt(n, decimals=0) {
 }
 
 // ── Wake Word Toggle ──
-let wakeWordEnabled = localStorage.getItem('dp_wakeword') !== 'off';
+// wakeWordEnabled disabled
 
 function toggleWakeWord() {
   wakeWordEnabled = !wakeWordEnabled;
@@ -3207,7 +3208,7 @@ function toggleWakeWord() {
     btn.style.borderColor = wakeWordEnabled ? 'var(--accent)' : 'var(--border)';
     btn.style.color = wakeWordEnabled ? '#fff' : 'var(--muted)';
   }
-  if (wakeWordEnabled) startWakeWord();
+  if (wakeWordEnabled) // startWakeWord() disabled
   else stopWakeWord();
 }
 
