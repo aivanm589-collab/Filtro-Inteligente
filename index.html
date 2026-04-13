@@ -3221,8 +3221,7 @@ function toggleWakeWord() {
     btn.style.borderColor = wakeWordEnabled ? 'var(--accent)' : 'var(--border)';
     btn.style.color = wakeWordEnabled ? '#fff' : 'var(--muted)';
   }
-  if (wakeWordEnabled) // startWakeWord() disabled
-  else stopWakeWord();
+  if (wakeWordEnabled) { /* wake word disabled */ } else stopWakeWord();
 }
 
 // ── Theme System ──
