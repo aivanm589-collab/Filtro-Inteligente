@@ -1,4 +1,4 @@
-const CACHE = 'rideprofit-v5';
+const CACHE = 'rideprofit-v10';
 const ASSETS = [
   '/Filtro-Inteligente/',
   '/Filtro-Inteligente/index.html',
@@ -8,10 +8,10 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', e => {
+  self.skipWaiting();
   e.waitUntil(
     caches.open(CACHE).then(c => c.addAll(ASSETS).catch(() => {}))
   );
-  self.skipWaiting();
 });
 
 self.addEventListener('activate', e => {
@@ -24,7 +24,8 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  // Always fetch fresh from network, fallback to cache
   e.respondWith(
-    caches.match(e.request).then(cached => cached || fetch(e.request))
+    fetch(e.request).catch(() => caches.match(e.request))
   );
 });

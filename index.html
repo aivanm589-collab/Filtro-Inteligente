@@ -841,6 +841,78 @@ body::before {
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
+  // ── Anti-fraud: Device fingerprint + Cloud usage tracking ──
+  function generateDeviceId() {
+    const raw = [
+      navigator.userAgent,
+      navigator.language,
+      screen.width + 'x' + screen.height,
+      screen.colorDepth,
+      new Date().getTimezoneOffset(),
+      navigator.hardwareConcurrency || '',
+      navigator.platform || ''
+    ].join('|');
+    // Simple hash
+    let hash = 0;
+    for (let i = 0; i < raw.length; i++) {
+      hash = ((hash << 5) - hash) + raw.charCodeAt(i);
+      hash |= 0;
+    }
+    return 'dev_' + Math.abs(hash).toString(36);
+  }
+
+  const DEVICE_ID = localStorage.getItem('rp_device_id') || generateDeviceId();
+  localStorage.setItem('rp_device_id', DEVICE_ID);
+
+  // Sync usage with Firestore
+  async function syncUsageWithCloud() {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const docRef = doc(db, 'usage', DEVICE_ID);
+      const snap = await getDoc(docRef);
+      
+      if (snap.exists()) {
+        const data = snap.data();
+        // If cloud has more usage than local, use cloud data (prevents reset trick)
+        if (data.date === today && data.count > (getUsageData().count || 0)) {
+          const local = getUsageData();
+          local.count = data.count;
+          local.date = today;
+          if (data.premium) local.premium = true;
+          saveUsage(local);
+          updateQueryCounter();
+        }
+        // Restore premium from cloud
+        if (data.premium === true) {
+          const local = getUsageData();
+          local.premium = true;
+          saveUsage(local);
+          updateQueryCounter();
+        }
+      }
+    } catch(e) { console.log('Sync error:', e); }
+  }
+
+  async function pushUsageToCloud() {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const usage = getUsageData();
+      const docRef = doc(db, 'usage', DEVICE_ID);
+      await setDoc(docRef, {
+        date: today,
+        count: usage.count || 0,
+        premium: usage.premium || false,
+        lastSeen: serverTimestamp(),
+        deviceId: DEVICE_ID
+      }, { merge: true });
+    } catch(e) { console.log('Push error:', e); }
+  }
+
+  // Expose to global scope
+  window.syncUsageWithCloud = syncUsageWithCloud;
+  window.pushUsageToCloud = pushUsageToCloud;
+  window.DEVICE_ID = DEVICE_ID;
+
   // Make saveToFirebase available globally
   window.saveToFirebase = async function(data) {
     try {
@@ -2799,6 +2871,8 @@ function incrementUsage() {
   d.count++;
   saveUsage(d);
   updateQueryCounter();
+  // Sync to cloud to prevent reinstall trick
+  if (window.pushUsageToCloud) window.pushUsageToCloud();
   return true;
 }
 
