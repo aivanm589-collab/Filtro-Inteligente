@@ -959,7 +959,7 @@ body::before {
         </div>
         <div style="display:flex;flex-direction:column;gap:10px;width:100%">
           <div style="display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:12px;padding:14px 16px">
-            <span style="font-size:20px">🎙️</span>
+            <span style="font-size:20px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>️</span>
             <span style="font-size:12px;color:var(--text);font-family:'Inconsolata',monospace;text-align:left">Dictado de voz — sin tocar la pantalla</span>
           </div>
           <div style="display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:12px;padding:14px 16px">
@@ -1505,7 +1505,7 @@ body::before {
       <!-- Wake word toggle -->
       <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px">
         <div>
-          <div style="font-size:12px;font-weight:700;margin-bottom:2px">🎙️ Escucha en segundo plano</div>
+          <div style="font-size:12px;font-weight:700;margin-bottom:2px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>️ Escucha en segundo plano</div>
           <div style="font-size:10px;color:var(--muted);font-family:'Inconsolata',monospace"></div>
         </div>
         <button id="wake-toggle-btn" onclick="toggleWakeWord()" style="padding:8px 14px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:#fff;font-size:11px;font-family:'Inconsolata',monospace;cursor:pointer">ON</button>
@@ -2499,7 +2499,7 @@ function startVoice() {
     document.getElementById('mic-btn').style.transform = 'scale(1.1)';
     document.getElementById('mic-icon').textContent = '⏹';
     document.getElementById('mic-text').textContent = 'ESCUCHANDO...';
-    showVoiceStatus('🎙️ Habla ahora: "110 pesos, 20 minutos, 5.7 km"', '#4f7fff');
+    showVoiceStatus('<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>️ Habla ahora: "110 pesos, 20 minutos, 5.7 km"', '#4f7fff');
   };
 
   voiceRecognition.onresult = (e) => {
@@ -2528,7 +2528,7 @@ function stopVoice() {
   document.getElementById('mic-btn').style.background = '#25D366';
   document.getElementById('mic-btn').style.boxShadow = '0 4px 20px rgba(37,211,102,0.4)';
   document.getElementById('mic-btn').style.transform = 'scale(1)';
-  document.getElementById('mic-icon').textContent = '🎙️';
+  document.getElementById('mic-icon').textContent = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>️';
   document.getElementById('mic-text').textContent = 'DICTAR PEDIDO';
 }
 
