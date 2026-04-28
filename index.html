@@ -3148,7 +3148,7 @@ function stopWakeWord() {
 
 // ── Platform Selection ──
 function buildPlatformList() {
-  const platforms = PLATFORMS[APP.userType] || [];
+  const platforms = PLATFORMS[selectedDriver || APP.userType] || [];
   const el = document.getElementById('platform-list');
   el.innerHTML = platforms.map(p => `
     <div class="vehicle-card" id="pc-${p.id}" onclick="selectPlatform('${p.id}','${p.name}','${p.mode}')">
