@@ -1145,10 +1145,21 @@ body::before {
         </div>
       </div>
 
-      <button class="btn-primary" onclick="finishOnboarding()" style="margin-top:auto">
+      <button class="btn-primary" onclick="goTo(4)" style="margin-top:auto">
         EMPEZAR A USAR →
       </button>
       <button class="btn-secondary" onclick="goTo(2.5)">← Volver</button>
+    </div>
+
+    <!-- ── STEP 4: Platform ── -->
+    <div class="screen" id="s4">
+      <div class="screen-label" id="s4-label">PASO 5 DE 5</div>
+      <div class="screen-title">¿En qué app repartes?</div>
+      <div class="screen-sub">Optimizamos el cálculo según tu plataforma.</div>
+
+      <div class="vehicle-grid" id="platform-list"></div>
+
+      <button class="btn-secondary" onclick="goTo(3)">← Volver</button>
     </div>
 
     <!-- ── MAIN: Calculator ── -->
@@ -1789,6 +1800,8 @@ const APP = {
   rendimiento: null, gasolinaPrice: null,
   onboardingDone: false,
   incentiveActive: false,
+  platform: '',
+  platformMode: 'normal',
   maxDistance: 0,
   incentiveBonus: 0,
   incentiveOrders: 0,
@@ -1801,14 +1814,29 @@ let currentStep = 1;
 
 const VEHICLES = {
   delivery: [
-    { id: 'bicycle',  icon: '🚲', name: 'Bicicleta',       cpkm: 0.5,  cpm: 0.3 },
-    { id: 'ebike',    icon: '⚡', name: 'Bici eléctrica',  cpkm: 1.0,  cpm: 0.4 },
-    { id: 'motorcycle', icon: '🛵', name: 'Moto',          cpkm: 1.5,  cpm: 0.5 },
-    { id: 'car',      icon: '🚗', name: 'Auto',            cpkm: 3.0,  cpm: 0.8 },
+    { id: 'bicycle',    icon: '🚲', name: 'Bici / Bici eléctrica', cpkm: 0,    cpm: 0 },
+    { id: 'motorcycle', icon: '🛵', name: 'Moto',                  cpkm: 1.5,  cpm: 0.5 },
+    { id: 'car',        icon: '🚗', name: 'Auto',                  cpkm: 3.0,  cpm: 0.8 },
   ],
   rideshare: [
-    { id: 'motorcycle', icon: '🛵', name: 'Moto',          cpkm: 1.5,  cpm: 0.5 },
-    { id: 'car',      icon: '🚗', name: 'Auto',            cpkm: 3.0,  cpm: 0.8 },
+    { id: 'motorcycle', icon: '🛵', name: 'Moto',  cpkm: 1.5,  cpm: 0.5 },
+    { id: 'car',        icon: '🚗', name: 'Auto',  cpkm: 3.0,  cpm: 0.8 },
+  ],
+};
+
+// Platforms by driver type
+const PLATFORMS = {
+  delivery: [
+    { id: 'rappi',     name: 'Rappi',      icon: '🟠', mode: 'map' },
+    { id: 'ubereats',  name: 'Uber Eats',  icon: '🟢', mode: 'normal' },
+    { id: 'didifood',  name: 'DiDi Food',  icon: '🟡', mode: 'normal' },
+    { id: 'other',     name: 'Otra',       icon: '📦', mode: 'normal' },
+  ],
+  rideshare: [
+    { id: 'uber',      name: 'Uber',       icon: '⚫', mode: 'normal' },
+    { id: 'didi',      name: 'DiDi',       icon: '🟡', mode: 'normal' },
+    { id: 'indriver',  name: 'InDriver',   icon: '🔵', mode: 'normal' },
+    { id: 'other',     name: 'Otra',       icon: '🚗', mode: 'normal' },
   ],
 };
 
@@ -1946,6 +1974,7 @@ function goTo(step) {
   else if (step === 2)   { buildVehicleList(); setScreen('s2'); }
   else if (step === 2.5) { resetS25(); setScreen('s25'); }
   else if (step === 3)   setScreen('s3');
+  else if (step === 4)   { buildPlatformList(); setScreen('s4'); }
 }
 
 function resetS25() {
@@ -3115,6 +3144,31 @@ function startWakeWord() {
 function stopWakeWord() {
   if (wakeRecognition) { wakeRecognition.stop(); wakeRecognition = null; }
   wakeWordActive = false;
+}
+
+// ── Platform Selection ──
+function buildPlatformList() {
+  const platforms = PLATFORMS[APP.userType] || [];
+  const el = document.getElementById('platform-list');
+  el.innerHTML = platforms.map(p => `
+    <div class="vehicle-card" id="pc-${p.id}" onclick="selectPlatform('${p.id}','${p.name}','${p.mode}')">
+      <div style="font-size:28px">${p.icon}</div>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:15px">${p.name}</div>
+      </div>
+      <div style="width:20px;height:20px;border-radius:50%;border:2px solid var(--border)" id="pcheck-${p.id}"></div>
+    </div>
+  `).join('');
+}
+
+function selectPlatform(id, name, mode) {
+  APP.platform = id;
+  APP.platformMode = mode;
+  APP.vehicleLabel = APP.vehicleLabel;
+  document.querySelectorAll('[id^=pc-]').forEach(c => c.classList.remove('selected'));
+  document.getElementById('pc-' + id).classList.add('selected');
+  saveToStorage();
+  setTimeout(() => finishOnboarding(), 400);
 }
 
 // ── GPS Demand Detector ──
