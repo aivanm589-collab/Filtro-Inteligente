@@ -1221,8 +1221,8 @@ body::before {
         <div style="font-size:11px;color:var(--muted);font-family:'Inconsolata',monospace" id="rappi-min-result">0 min estimados</div>
       </div>
 
-      <!-- Calculate button -->
-      <button class="btn-primary" id="rappi-calc-btn" onclick="calculateRappi()" style="opacity:0.4;pointer-events:none">
+      <!-- Calculate button (hidden - auto calculates) -->
+      <button class="btn-primary" id="rappi-calc-btn" onclick="calculateRappi()" style="display:none">
         CALCULAR PEDIDO →
       </button>
 
@@ -3356,7 +3356,13 @@ function setupRappiMap() {
       }
 
       rappiMapStep = 'A'; // reset for next use
-      calculateRappiDistance();
+      calculateRappiDistance().then(() => {
+        // Auto-calculate if payment is already filled
+        const payment = parseFloat(document.getElementById('rappi-payment').value);
+        if (payment > 0 && window.rappiCalcKm) {
+          calculateRappi();
+        }
+      });
     }
   });
 }
@@ -3448,12 +3454,13 @@ function calculateRappi() {
 }
 
 function rappiAutoCalc() {
-  // Auto-enable button when payment is filled and points are marked
   const payment = parseFloat(document.getElementById('rappi-payment').value);
   const btn = document.getElementById('rappi-calc-btn');
   if (payment > 0 && window.rappiCalcKm) {
     btn.style.opacity = '1';
     btn.style.pointerEvents = 'all';
+    // Auto-calculate immediately
+    calculateRappi();
   }
 }
 
