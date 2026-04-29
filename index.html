@@ -2434,8 +2434,34 @@ function newOrder() {
   document.getElementById('ci-km').style.color = 'rgba(238,242,255,0.3)';
   document.getElementById('ci-min').style.color = 'rgba(238,242,255,0.3)';
   document.getElementById('calc-indicator').style.opacity = '0';
-  setScreen('s-calc', 's-result');
   document.getElementById('bn-calc').classList.add('active');
+
+  // Check platform mode
+  if (APP.platform === 'rappi') {
+    // Reset rappi state
+    rappiPointA = null;
+    rappiPointB = null;
+    rappiMapStep = 'A';
+    window.rappiCalcKm = null;
+    window.rappiCalcMin = null;
+    if (rappiRouteLine) { rappiRouteLine.remove(); rappiRouteLine = null; }
+    if (rappiMarkerA) { rappiMarkerA.remove(); rappiMarkerA = null; }
+    if (rappiMarkerB) { rappiMarkerB.remove(); rappiMarkerB = null; }
+    document.getElementById('rappi-payment').value = '';
+    document.getElementById('rappi-distance-result').style.display = 'none';
+    document.getElementById('rappi-a-coords').textContent = 'sin marcar';
+    document.getElementById('rappi-b-coords').textContent = 'sin marcar';
+    document.getElementById('rappi-point-a').style.background = 'var(--surface2)';
+    document.getElementById('rappi-point-b').style.background = 'var(--surface2)';
+    document.getElementById('rappi-point-a').style.color = 'var(--muted)';
+    document.getElementById('rappi-point-b').style.color = 'var(--muted)';
+    const btn = document.getElementById('rappi-calc-btn');
+    btn.style.opacity = '0.4';
+    btn.style.pointerEvents = 'none';
+    showMain('rappi');
+  } else {
+    setScreen('s-calc', 's-result');
+  }
 }
 
 function renderHistory() {
@@ -2999,32 +3025,6 @@ function showPaywall() {
 function closePaywall() {
   document.getElementById('s-paywall').style.display = 'none';
   document.getElementById('bottom-nav-wrap').style.display = 'flex';
-  // Return to Rappi mode if that's the active platform
-  if (APP.platform === 'rappi') {
-    // Reset rappi map state
-    rappiPointA = null;
-    rappiPointB = null;
-    rappiMapStep = 'A';
-    window.rappiCalcKm = null;
-    window.rappiCalcMin = null;
-    if (rappiRouteLine) { rappiRouteLine.remove(); rappiRouteLine = null; }
-    if (rappiMarkerA) { rappiMarkerA.remove(); rappiMarkerA = null; }
-    if (rappiMarkerB) { rappiMarkerB.remove(); rappiMarkerB = null; }
-    document.getElementById('rappi-payment').value = '';
-    document.getElementById('rappi-distance-result').style.display = 'none';
-    document.getElementById('rappi-a-coords').textContent = 'sin marcar';
-    document.getElementById('rappi-b-coords').textContent = 'sin marcar';
-    document.getElementById('rappi-point-a').style.background = 'var(--surface2)';
-    document.getElementById('rappi-point-b').style.background = 'var(--surface2)';
-    document.getElementById('rappi-point-a').style.color = 'var(--muted)';
-    document.getElementById('rappi-point-b').style.color = 'var(--muted)';
-    const btn = document.getElementById('rappi-calc-btn');
-    btn.style.opacity = '0.4';
-    btn.style.pointerEvents = 'none';
-    showMain('rappi');
-  } else {
-    showMain('calc');
-  }
 }
 
 function activatePremium(plan) {
