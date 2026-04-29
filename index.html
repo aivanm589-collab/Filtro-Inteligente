@@ -3555,15 +3555,15 @@ function calculateRappi() {
   APP.platformMode = 'map';
 }
 
+let rappiPaymentTimer = null;
 function rappiAutoCalc() {
-  const payment = parseFloat(document.getElementById('rappi-payment').value);
-  const btn = document.getElementById('rappi-calc-btn');
-  if (payment > 0 && window.rappiCalcKm) {
-    btn.style.opacity = '1';
-    btn.style.pointerEvents = 'all';
-    // Auto-calculate immediately
-    calculateRappi();
-  }
+  clearTimeout(rappiPaymentTimer);
+  rappiPaymentTimer = setTimeout(() => {
+    const payment = parseFloat(document.getElementById('rappi-payment').value);
+    if (payment > 0 && window.rappiCalcKm) {
+      calculateRappi();
+    }
+  }, 1000); // wait 1 second after user stops typing
 }
 
 // ── DiDi Food Map Calculator ──
@@ -3712,9 +3712,13 @@ function calculateDidi() {
   doCalculate();
 }
 
+let didiPaymentTimer = null;
 function didiAutoCalc() {
-  const payment = parseFloat(document.getElementById('didi-payment').value);
-  if (payment > 0 && window.didiCalcKm) calculateDidi();
+  clearTimeout(didiPaymentTimer);
+  didiPaymentTimer = setTimeout(() => {
+    const payment = parseFloat(document.getElementById('didi-payment').value);
+    if (payment > 0 && window.didiCalcKm) calculateDidi();
+  }, 1000); // wait 1 second after user stops typing
 }
 
 function showDidiMode() {
