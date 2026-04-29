@@ -2999,7 +2999,32 @@ function showPaywall() {
 function closePaywall() {
   document.getElementById('s-paywall').style.display = 'none';
   document.getElementById('bottom-nav-wrap').style.display = 'flex';
-  showMain('calc');
+  // Return to Rappi mode if that's the active platform
+  if (APP.platform === 'rappi') {
+    // Reset rappi map state
+    rappiPointA = null;
+    rappiPointB = null;
+    rappiMapStep = 'A';
+    window.rappiCalcKm = null;
+    window.rappiCalcMin = null;
+    if (rappiRouteLine) { rappiRouteLine.remove(); rappiRouteLine = null; }
+    if (rappiMarkerA) { rappiMarkerA.remove(); rappiMarkerA = null; }
+    if (rappiMarkerB) { rappiMarkerB.remove(); rappiMarkerB = null; }
+    document.getElementById('rappi-payment').value = '';
+    document.getElementById('rappi-distance-result').style.display = 'none';
+    document.getElementById('rappi-a-coords').textContent = 'sin marcar';
+    document.getElementById('rappi-b-coords').textContent = 'sin marcar';
+    document.getElementById('rappi-point-a').style.background = 'var(--surface2)';
+    document.getElementById('rappi-point-b').style.background = 'var(--surface2)';
+    document.getElementById('rappi-point-a').style.color = 'var(--muted)';
+    document.getElementById('rappi-point-b').style.color = 'var(--muted)';
+    const btn = document.getElementById('rappi-calc-btn');
+    btn.style.opacity = '0.4';
+    btn.style.pointerEvents = 'none';
+    showMain('rappi');
+  } else {
+    showMain('calc');
+  }
 }
 
 function activatePremium(plan) {
@@ -3336,35 +3361,63 @@ function setupRappiMap() {
   });
 }
 
-function calculateRappiDistance() {
+let rappiRouteLine = null;
+
+async function calculateRappiDistance() {
   if (!rappiPointA || !rappiPointB) return;
 
-  // Haversine formula
-  const R = 6371;
-  const dLat = (rappiPointB.lat - rappiPointA.lat) * Math.PI / 180;
-  const dLon = (rappiPointB.lng - rappiPointA.lng) * Math.PI / 180;
-  const a = Math.sin(dLat/2)**2 +
-            Math.cos(rappiPointA.lat * Math.PI/180) *
-            Math.cos(rappiPointB.lat * Math.PI/180) *
-            Math.sin(dLon/2)**2;
-  const distKm = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  
-  // Estimate minutes (avg 25 km/h in city)
-  const minutos = Math.round((distKm / 25) * 60);
-  const kmRounded = Math.round(distKm * 10) / 10;
-
+  // Show loading
+  document.getElementById('rappi-km-result').textContent = 'Calculando...';
   document.getElementById('rappi-distance-result').style.display = 'block';
-  document.getElementById('rappi-km-result').textContent = kmRounded + ' km';
-  document.getElementById('rappi-min-result').textContent = minutos + ' min estimados';
 
-  // Enable calculate button
-  const btn = document.getElementById('rappi-calc-btn');
-  btn.style.opacity = '1';
-  btn.style.pointerEvents = 'all';
+  try {
+    // Use OSRM for real road routing (free, no API key needed)
+    const url = `https://router.project-osrm.org/route/v1/driving/${rappiPointA.lng},${rappiPointA.lat};${rappiPointB.lng},${rappiPointB.lat}?overview=full&geometries=geojson`;
+    const res = await fetch(url);
+    const data = await res.json();
 
-  // Store for calculation
-  window.rappiCalcKm = kmRounded;
-  window.rappiCalcMin = minutos;
+    if (data.code === 'Ok' && data.routes.length > 0) {
+      const route = data.routes[0];
+      const distKm = Math.round(route.distance / 100) / 10;
+      const minutos = Math.round(route.duration / 60);
+
+      // Draw real road route on map
+      if (rappiRouteLine) rappiRouteLine.remove();
+      const coords = route.geometry.coordinates.map(c => [c[1], c[0]]);
+      rappiRouteLine = L.polyline(coords, {
+        color: '#12f579', weight: 4, opacity: 0.8
+      }).addTo(rappiMap);
+
+      // Fit map to route
+      rappiMap.fitBounds(rappiRouteLine.getBounds(), { padding: [20, 20] });
+
+      document.getElementById('rappi-km-result').textContent = distKm + ' km';
+      document.getElementById('rappi-min-result').textContent = minutos + ' min por carretera';
+
+      const btn = document.getElementById('rappi-calc-btn');
+      btn.style.opacity = '1';
+      btn.style.pointerEvents = 'all';
+
+      window.rappiCalcKm = distKm;
+      window.rappiCalcMin = minutos;
+    }
+  } catch(e) {
+    // Fallback to haversine if OSRM fails
+    const R = 6371;
+    const dLat = (rappiPointB.lat - rappiPointA.lat) * Math.PI / 180;
+    const dLon = (rappiPointB.lng - rappiPointA.lng) * Math.PI / 180;
+    const a = Math.sin(dLat/2)**2 + Math.cos(rappiPointA.lat * Math.PI/180) *
+              Math.cos(rappiPointB.lat * Math.PI/180) * Math.sin(dLon/2)**2;
+    const distKm = Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * 10) / 10;
+    const minutos = Math.round((distKm / 25) * 60);
+    document.getElementById('rappi-km-result').textContent = distKm + ' km (aprox)';
+    document.getElementById('rappi-min-result').textContent = minutos + ' min estimados';
+    window.rappiCalcKm = distKm;
+    window.rappiCalcMin = minutos;
+    const btn = document.getElementById('rappi-calc-btn');
+    btn.style.opacity = '1';
+    btn.style.pointerEvents = 'all';
+  }
 }
 
 function showRappiMode() {
@@ -3383,12 +3436,15 @@ function calculateRappi() {
     return;
   }
 
-  // Fill main calculator and calculate
+  // Fill main calculator fields
   document.getElementById('c-payment').value = payment;
   document.getElementById('c-km').value = window.rappiCalcKm;
   document.getElementById('c-min').value = window.rappiCalcMin;
 
+  // Run calculation then show result
   doCalculate();
+  // Override "nuevo pedido" button to go back to Rappi mode
+  APP.platformMode = 'map';
 }
 
 function rappiAutoCalc() {
