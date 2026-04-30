@@ -2311,6 +2311,11 @@ function showMain(tab) {
   // Remove active from ALL screens — onboarding and main
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active', 'exit'));
   document.querySelectorAll('.bn-btn').forEach(b => b.classList.remove('active'));
+  // Clear result when navigating away
+  if (tab === 'calc' || tab === 'rappi' || tab === 'didi' || tab === 'didi-conductor') {
+    const resultScreen = document.getElementById('s-result');
+    if (resultScreen) resultScreen.classList.remove('active');
+  }
 
   const screenId = 's-' + tab;
   document.getElementById(screenId).classList.add('active');
@@ -4546,8 +4551,17 @@ if (alreadySetup) {
   // Skip onboarding, go straight to app
   document.getElementById('bottom-nav-wrap').style.display = 'flex';
   document.getElementById('progress-bar').style.display = 'none';
-  showMain('calc');
   restoreSession();
+  // Show correct screen based on saved platform
+  if (APP.platform === 'rappi') {
+    setTimeout(() => showRappiMode(), 300);
+  } else if (APP.platform === 'didifood') {
+    setTimeout(() => showDidiMode(), 300);
+  } else if (APP.platform === 'didi' && APP.userType === 'rideshare') {
+    setTimeout(() => showDidiCMode(), 300);
+  } else {
+    showMain('calc');
+  }
 } else {
   goTo(0);
 }
