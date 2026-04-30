@@ -1430,6 +1430,18 @@ body::before {
           <div class="rv-detail"><div class="rdl">$/KM NETO</div><div class="rdv" id="rv-pkm">$0</div></div>
         </div>
       </div>
+      <!-- Counteroffer section - only for DiDi conductor -->
+      <div id="counteroffer-section" style="display:none;margin-top:12px">
+        <div style="background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.4);border-radius:14px;padding:14px">
+          <div style="font-size:11px;font-weight:700;color:#d97706;font-family:'Inconsolata',monospace;margin-bottom:10px">💡 ANÁLISIS DE CONTRAOFERTA DiDi</div>
+          <div id="counteroffer-options" style="display:flex;flex-direction:column;gap:8px"></div>
+          <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(251,191,36,0.2)">
+            <div style="font-size:10px;color:var(--muted);font-family:'Inconsolata',monospace;margin-bottom:6px">MÍNIMO PARA TU META:</div>
+            <div style="font-size:18px;font-weight:800;color:#d97706" id="counteroffer-minimum"></div>
+          </div>
+        </div>
+      </div>
+
       <button class="calc-btn" onclick="newOrder()">← NUEVO PEDIDO</button>
     </div>
 
@@ -2484,6 +2496,8 @@ function doCalculate() {
   } catch(e) { console.log('Firebase error:', e); }
 
   setScreen('s-result', 's-calc');
+  // Show counteroffer analysis for DiDi conductor
+  showCounterOffers(effectivePayment, km, minutes);
   document.getElementById('bn-calc').classList.add('active');
 }
 
@@ -3086,6 +3100,13 @@ function updateQueryCounter() {
 }
 
 function showPaywall() {
+  // Set price based on user type
+  const isRideshare = APP.userType === 'rideshare';
+  const priceEl = document.getElementById('paywall-price');
+  const planEl = document.getElementById('paywall-plan-name');
+  if (priceEl) priceEl.textContent = isRideshare ? '$49' : '$30';
+  if (planEl) planEl.textContent = isRideshare ? 'RIDEPROFIT CONDUCTOR' : 'RIDEPROFIT REPARTIDOR';
+
   document.getElementById('s-paywall').style.display = 'flex';
   document.getElementById('bottom-nav-wrap').style.display = 'none';
 }
@@ -3740,6 +3761,82 @@ function resetDidiMap() {
   document.getElementById('didi-b-coords').textContent = 'toca el mapa';
   document.getElementById('didi-point-a').style.cssText = 'flex:1;background:var(--surface2);border-radius:8px;padding:8px;font-size:10px;font-family:Inconsolata,monospace;color:var(--muted);text-align:center';
   document.getElementById('didi-point-b').style.cssText = 'flex:1;background:var(--surface2);border-radius:8px;padding:8px;font-size:10px;font-family:Inconsolata,monospace;color:var(--muted);text-align:center';
+}
+
+// ── Counteroffer System ──
+function calculateCounterOffers(payment, km, minutes, costPerKm, minProfitPerHour) {
+  // DiDi typical counteroffer options (increments of ~4-5)
+  const didiOptions = [
+    payment,
+    Math.round(payment * 1.08),
+    Math.round(payment * 1.12),
+    Math.round(payment * 1.16)
+  ];
+
+  const results = didiOptions.map(p => {
+    const ganancia = p - (km * costPerKm);
+    const ph = (ganancia / minutes) * 60;
+    const acepta = ph >= minProfitPerHour;
+    return { precio: p, ganancia: Math.round(ganancia), ph: Math.round(ph), acepta };
+  });
+
+  // Calculate minimum price needed
+  const costoViaje = km * costPerKm;
+  const gananciaNecesaria = (minProfitPerHour * minutes) / 60;
+  const precioMinimo = Math.ceil(costoViaje + gananciaNecesaria);
+
+  return { results, precioMinimo };
+}
+
+function showCounterOffers(payment, km, minutes) {
+  if (APP.platform !== 'didi' || APP.userType !== 'rideshare') {
+    document.getElementById('counteroffer-section').style.display = 'none';
+    return;
+  }
+
+  const { results, precioMinimo } = calculateCounterOffers(
+    payment, km, minutes, APP.costPerKm, APP.minProfitPerHour
+  );
+
+  const section = document.getElementById('counteroffer-section');
+  const optionsEl = document.getElementById('counteroffer-options');
+  const minEl = document.getElementById('counteroffer-minimum');
+
+  // Show counteroffer only if base price doesn't work
+  const baseOk = results[0].acepta;
+  if (baseOk) {
+    section.style.display = 'none';
+    return;
+  }
+
+  section.style.display = 'block';
+
+  optionsEl.innerHTML = results.map((r, i) => {
+    const isBase = i === 0;
+    const color = r.acepta ? 'var(--green)' : 'var(--red)';
+    const icon = r.acepta ? '✅' : '❌';
+    const label = isBase ? 'Oferta base' : `Contraoferta $${r.precio}`;
+    return `
+      <div style="display:flex;justify-content:space-between;align-items:center;background:var(--surface);border-radius:10px;padding:10px 12px;border:1px solid ${r.acepta ? 'var(--green)' : 'var(--border)'}">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--text)">${icon} $${r.precio}</div>
+          <div style="font-size:10px;color:var(--muted);font-family:'Inconsolata',monospace">${label}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:13px;font-weight:700;color:${color}">$${r.ph}/h</div>
+          <div style="font-size:10px;color:var(--muted);font-family:'Inconsolata',monospace">gan. $${r.ganancia}</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  // Show minimum needed
+  const anyAccepted = results.some(r => r.acepta);
+  if (!anyAccepted) {
+    minEl.textContent = `$${precioMinimo} para alcanzar $${APP.minProfitPerHour}/h`;
+  } else {
+    minEl.style.display = 'none';
+    document.querySelector('#counteroffer-section .border-top').style.display = 'none';
+  }
 }
 
 // ── GPS Demand Detector ──
