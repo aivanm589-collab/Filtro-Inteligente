@@ -3867,25 +3867,42 @@ function resetDidiMap() {
 
 // ── Counteroffer System ──
 function calculateCounterOffers(payment, km, minutes, costPerKm, minProfitPerHour) {
-  // DiDi typical counteroffer options (increments of ~4-5)
-  const didiOptions = [
+  const costoViaje = km * costPerKm;
+  const gananciaNecesaria = (minProfitPerHour * minutes) / 60;
+  const precioMinimo = Math.ceil(costoViaje + gananciaNecesaria);
+
+  // Build options: base + DiDi options + minimum needed + above minimum
+  const didiOpciones = [
     payment,
     Math.round(payment * 1.08),
     Math.round(payment * 1.12),
     Math.round(payment * 1.16)
   ];
 
-  const results = didiOptions.map(p => {
-    const ganancia = p - (km * costPerKm);
+  // Always include the minimum needed and slight variations above it
+  const opcionesExtra = [
+    precioMinimo,
+    precioMinimo + 5,
+    precioMinimo + 10
+  ];
+
+  // Merge, deduplicate, sort
+  const todasOpciones = [...new Set([...didiOpciones, ...opcionesExtra])].sort((a, b) => a - b);
+
+  const results = todasOpciones.map(p => {
+    const ganancia = p - costoViaje;
     const ph = (ganancia / minutes) * 60;
     const acepta = ph >= minProfitPerHour;
-    return { precio: p, ganancia: Math.round(ganancia), ph: Math.round(ph), acepta };
+    const esDiDi = didiOpciones.includes(p);
+    return { 
+      precio: p, 
+      ganancia: Math.round(ganancia), 
+      ph: Math.round(ph), 
+      acepta,
+      esDiDi,
+      esMinimo: p === precioMinimo
+    };
   });
-
-  // Calculate minimum price needed
-  const costoViaje = km * costPerKm;
-  const gananciaNecesaria = (minProfitPerHour * minutes) / 60;
-  const precioMinimo = Math.ceil(costoViaje + gananciaNecesaria);
 
   return { results, precioMinimo };
 }
