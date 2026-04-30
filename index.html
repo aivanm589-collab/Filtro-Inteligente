@@ -2506,7 +2506,10 @@ function doCalculate() {
   const greenThreshold  = efectiveMinimum * 1.3;
 
   let score;
-  if (profitPerHour >= greenThreshold)       score = 'green';
+  // Handle negative profit explicitly
+  if (realProfit <= 0) {
+    score = 'red';
+  } else if (profitPerHour >= greenThreshold)       score = 'green';
   else if (profitPerHour >= efectiveMinimum) score = 'yellow';
   else {
     // Regla secundaria: casi llega al piso y distancia corta
@@ -2517,6 +2520,26 @@ function doCalculate() {
     }
   }
 
+  // Override verdict for negative profit
+  if (realProfit <= 0) {
+    document.getElementById('rv-verdict').textContent = 'RECHAZAR';
+    document.getElementById('rv-sub').textContent = '⚠️ El viaje cuesta más que el pago';
+    document.getElementById('rv-profit').textContent = '-$' + fmt(Math.abs(realProfit));
+    document.getElementById('rv-ph').textContent = '$0/h';
+    document.getElementById('rv-pay').textContent = '$' + fmt(effectivePayment);
+    document.getElementById('rv-cost').textContent = '$' + fmt(travelCost);
+    document.getElementById('rv-pkm').textContent = '-$' + fmt(Math.abs(effectivePayment - travelCost) / km, 1);
+    const card = document.getElementById('result-card');
+    card.style.background = 'linear-gradient(135deg,#2a0606,#3d0a0a)';
+    card.style.border = '1.5px solid rgba(249,64,64,0.4)';
+    card.style.boxShadow = '0 0 32px rgba(249,64,64,0.2)';
+    document.getElementById('rv-verdict').style.color = 'var(--red)';
+    document.getElementById('gps-badge').style.display = 'none';
+    document.getElementById('demand-badge').style.display = 'none';
+    document.getElementById('counteroffer-section').style.display = 'none';
+    setScreen('s-result', 's-calc');
+    return;
+  }
   const vc = VERDICT[score];
   const card = document.getElementById('result-card');
   card.style.background = vc.bg;
