@@ -1518,9 +1518,9 @@ body::before {
       <!-- Pricing card -->
       <div style="background:var(--surface);border:2px solid var(--accent);border-radius:20px;padding:28px;width:100%;max-width:280px;margin-bottom:24px">
         <div style="font-size:11px;font-weight:700;color:var(--accent);font-family:'Inconsolata',monospace;letter-spacing:0.1em;margin-bottom:8px">RIDEPROFIT PRO</div>
-        <div style="font-size:42px;font-weight:900;font-family:'Inter',sans-serif;color:var(--text)">$35</div>
+        <div style="font-size:42px;font-weight:900;font-family:'Inter',sans-serif;color:var(--text)">$30</div>
         <div style="font-size:12px;color:var(--muted);font-family:'Inconsolata',monospace;margin-bottom:20px">pesos / mes</div>
-        <div style="font-size:12px;color:var(--text);font-family:'Inconsolata',monospace;line-height:2;text-align:left">
+        <div id="paywall-features" style="font-size:12px;color:var(--text);font-family:'Inconsolata',monospace;line-height:2;text-align:left">
           ✅ Consultas ilimitadas<br>
           ✅ Historial completo<br>
           ✅ Sesiones de trabajo<br>
@@ -1529,7 +1529,7 @@ body::before {
       </div>
 
       <button onclick="activatePremium('monthly')" style="width:100%;max-width:280px;padding:18px;background:var(--accent);border:none;border-radius:14px;color:#fff;font-size:16px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;margin-bottom:10px">
-        MENSUAL — $35/mes
+        MENSUAL — $30/mes
       </button>
       <button onclick="activatePremium('annual')" style="width:100%;max-width:280px;padding:16px;background:linear-gradient(135deg,#059652,#12f579);border:none;border-radius:14px;color:#000;font-size:15px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;margin-bottom:14px;position:relative">
         ANUAL — $25/mes
@@ -1649,9 +1649,9 @@ body::before {
       <!-- Pricing card -->
       <div style="background:var(--surface);border:2px solid var(--accent);border-radius:20px;padding:28px;width:100%;max-width:280px;margin-bottom:24px">
         <div style="font-size:11px;font-weight:700;color:var(--accent);font-family:'Inconsolata',monospace;letter-spacing:0.1em;margin-bottom:8px">RIDEPROFIT PRO</div>
-        <div style="font-size:42px;font-weight:900;font-family:'Inter',sans-serif;color:var(--text)">$35</div>
+        <div style="font-size:42px;font-weight:900;font-family:'Inter',sans-serif;color:var(--text)">$30</div>
         <div style="font-size:12px;color:var(--muted);font-family:'Inconsolata',monospace;margin-bottom:20px">pesos / mes</div>
-        <div style="font-size:12px;color:var(--text);font-family:'Inconsolata',monospace;line-height:2;text-align:left">
+        <div id="paywall-features" style="font-size:12px;color:var(--text);font-family:'Inconsolata',monospace;line-height:2;text-align:left">
           ✅ Consultas ilimitadas<br>
           ✅ Historial completo<br>
           ✅ Sesiones de trabajo<br>
@@ -1660,7 +1660,7 @@ body::before {
       </div>
 
       <button onclick="activatePremium('monthly')" style="width:100%;max-width:280px;padding:18px;background:var(--accent);border:none;border-radius:14px;color:#fff;font-size:16px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;margin-bottom:10px">
-        MENSUAL — $35/mes
+        MENSUAL — $30/mes
       </button>
       <button onclick="activatePremium('annual')" style="width:100%;max-width:280px;padding:16px;background:linear-gradient(135deg,#059652,#12f579);border:none;border-radius:14px;color:#000;font-size:15px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;margin-bottom:14px;position:relative">
         ANUAL — $25/mes
@@ -3179,12 +3179,35 @@ function updateQueryCounter() {
 }
 
 function showPaywall() {
-  // Set price based on user type
   const isRideshare = APP.userType === 'rideshare';
   const priceEl = document.getElementById('paywall-price');
   const planEl = document.getElementById('paywall-plan-name');
+  const periodEl = document.getElementById('paywall-period');
+  const featuresEl = document.getElementById('paywall-features');
+
   if (priceEl) priceEl.textContent = isRideshare ? '$49' : '$30';
   if (planEl) planEl.textContent = isRideshare ? 'RIDEPROFIT CONDUCTOR' : 'RIDEPROFIT REPARTIDOR';
+  if (periodEl) periodEl.textContent = 'pesos / mes';
+
+  // Update features based on plan
+  if (featuresEl) {
+    if (isRideshare) {
+      featuresEl.innerHTML = `
+        ✅ Consultas ilimitadas<br>
+        ✅ Todas las plataformas<br>
+        ✅ Contraoferta DiDi inteligente<br>
+        ✅ Mapa para Rappi y DiDi Food<br>
+        ✅ Historial y sesiones<br>
+        ✅ Sin anuncios`;
+    } else {
+      featuresEl.innerHTML = `
+        ✅ Consultas ilimitadas<br>
+        ✅ Rappi, Uber Eats, DiDi Food<br>
+        ✅ Mapa para Rappi y DiDi Food<br>
+        ✅ Historial y sesiones<br>
+        ✅ Sin anuncios`;
+    }
+  }
 
   document.getElementById('s-paywall').style.display = 'flex';
   document.getElementById('bottom-nav-wrap').style.display = 'none';
@@ -3215,7 +3238,7 @@ function activatePremium(plan) {
   // Go to calc
   showMain('calc');
 
-  const planLabel = plan === 'annual' ? 'Anual $25/mes' : 'Mensual $35';
+  const planLabel = plan === 'annual' ? 'Anual $25/mes' : 'Mensual $30';
   showToast('⭐ Premium activado · ' + planLabel);
 }
 
