@@ -2536,7 +2536,8 @@ function doCalculate() {
     document.getElementById('rv-verdict').style.color = 'var(--red)';
     document.getElementById('gps-badge').style.display = 'none';
     document.getElementById('demand-badge').style.display = 'none';
-    document.getElementById('counteroffer-section').style.display = 'none';
+    // Still show counteroffer even for negative profit
+    showCounterOffers(effectivePayment, km, minutes);
     setScreen('s-result', 's-calc');
     return;
   }
