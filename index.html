@@ -1551,9 +1551,12 @@ body::before {
           </div>
         </div>
         <div class="rv-details">
-          <div class="rv-detail"><div class="rdl">COSTO VIAJE" style="display:none</div><div class="rdv" id="rv-cost" style="display:none">$0</div></div>
-          <div class="rv-detail"><div class="rdl">PAGADO</div><div class="rdv" id="rv-pay">$0</div></div>
-          <div class="rv-detail"><div class="rdl">$/KM NETO</div><div class="rdv" id="rv-pkm">$0</div></div>
+          <div class="rv-detail" style="flex:1">
+            <div class="rdl">PAGO POR KM</div>
+            <div class="rdv" id="rv-pkm">$0/km</div>
+          </div>
+          <div style="display:none" id="rv-pay">$0</div>
+          <div style="display:none" id="rv-cost">$0</div>
         </div>
       </div>
       <!-- Counteroffer section - only for DiDi conductor -->
@@ -2592,7 +2595,7 @@ function doCalculate() {
     document.getElementById('rv-ph').textContent = '$0/h';
     document.getElementById('rv-pay').textContent = '$' + fmt(effectivePayment);
     document.getElementById('rv-cost').textContent = '$' + fmt(travelCost);
-    document.getElementById('rv-pkm').textContent = '-$' + fmt(Math.abs(effectivePayment - travelCost) / km, 1);
+    document.getElementById('rv-pkm').textContent = '$' + fmt(effectivePayment / km, 1) + '/km';
     const card = document.getElementById('result-card');
     card.style.background = 'linear-gradient(135deg,#2a0606,#3d0a0a)';
     card.style.border = '1.5px solid rgba(249,64,64,0.4)';
@@ -2624,7 +2627,7 @@ function doCalculate() {
   document.getElementById('rv-pay').textContent     = incentiveBonus > 0
     ? '$' + fmt(payment) + '+$' + incentiveBonus.toFixed(0)
     : '$' + fmt(payment);
-  document.getElementById('rv-pkm').textContent     = '$' + fmt((realProfit / km), 1);
+  document.getElementById('rv-pkm').textContent     = '$' + fmt(effectivePayment / km, 1) + '/km';
 
   orderHistory.unshift({ payment, km, minutes, travelCost, realProfit, profitPerHour, score, verdict: vc.label, time: Date.now() });
   updateStateDisplay();
