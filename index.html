@@ -1591,7 +1591,7 @@ body::before {
       </div>
 
       <button onclick="activatePremium('monthly')" style="width:100%;max-width:280px;padding:18px;background:var(--accent);border:none;border-radius:14px;color:#fff;font-size:16px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;margin-bottom:10px">
-        MENSUAL — $30/mes
+        <span id="paywall-btn-price">MENSUAL — $30/mes</span>
       </button>
       <button onclick="activatePremium('annual')" style="width:100%;max-width:280px;padding:16px;background:linear-gradient(135deg,#059652,#12f579);border:none;border-radius:14px;color:#000;font-size:15px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;margin-bottom:14px;position:relative">
         ANUAL — $25/mes
@@ -1722,7 +1722,7 @@ body::before {
       </div>
 
       <button onclick="activatePremium('monthly')" style="width:100%;max-width:280px;padding:18px;background:var(--accent);border:none;border-radius:14px;color:#fff;font-size:16px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;margin-bottom:10px">
-        MENSUAL — $30/mes
+        <span id="paywall-btn-price">MENSUAL — $30/mes</span>
       </button>
       <button onclick="activatePremium('annual')" style="width:100%;max-width:280px;padding:16px;background:linear-gradient(135deg,#059652,#12f579);border:none;border-radius:14px;color:#000;font-size:15px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;margin-bottom:14px;position:relative">
         ANUAL — $25/mes
@@ -3315,6 +3315,10 @@ function showPaywall() {
         ✅ Sin anuncios`;
     }
   }
+
+  // Update subscribe button price
+  const btnPrice = document.getElementById('paywall-btn-price');
+  if (btnPrice) btnPrice.textContent = isRideshare ? 'MENSUAL — $49/mes' : 'MENSUAL — $30/mes';
 
   document.getElementById('s-paywall').style.display = 'flex';
   document.getElementById('bottom-nav-wrap').style.display = 'none';
