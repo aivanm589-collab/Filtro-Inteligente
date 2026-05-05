@@ -1426,15 +1426,6 @@ body::before {
     <!-- ── MAIN: Calculator ── -->
     <div class="screen" id="s-calc">
 
-      <!-- Screenshot AI Analysis Button -->
-      <div style="margin-bottom:12px">
-        <label for="screenshot-input" style="display:flex;align-items:center;justify-content:center;gap:8px;background:var(--surface);border:1.5px dashed var(--accent);border-radius:12px;padding:12px;cursor:pointer;font-family:'Inconsolata',monospace;font-size:12px;font-weight:700;color:var(--accent)">
-          📸 ANALIZAR SCREENSHOT CON IA
-        </label>
-        <input type="file" id="screenshot-input" accept="image/*" style="display:none" onchange="analyzeScreenshot(event)">
-        <div id="screenshot-status" style="display:none;text-align:center;font-size:11px;font-family:'Inconsolata',monospace;color:var(--muted);margin-top:6px"></div>
-      </div>
-
       <!-- Fuel vehicle header -->
       <div class="calc-header" id="fuel-header">
         <div>
@@ -4373,87 +4364,6 @@ function showIndriverMode() {
   if (el) el.textContent = APP.vehicleLabel || 'Auto';
   showMain('indriver');
   setTimeout(() => initIndriverMap(), 300);
-}
-
-// ── Screenshot AI Analysis ──
-async function analyzeScreenshot(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  const statusEl = document.getElementById('screenshot-status');
-  statusEl.style.display = 'block';
-  statusEl.textContent = '🤖 Analizando imagen...';
-  statusEl.style.color = 'var(--accent)';
-
-  try {
-    // Convert image to base64
-    const base64 = await new Promise((res, rej) => {
-      const reader = new FileReader();
-      reader.onload = () => res(reader.result.split(',')[1]);
-      reader.onerror = rej;
-      reader.readAsDataURL(file);
-    });
-
-    // Call Claude API to analyze the screenshot
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 200,
-        messages: [{
-          role: 'user',
-          content: [
-            {
-              type: 'image',
-              source: { type: 'base64', media_type: file.type, data: base64 }
-            },
-            {
-              type: 'text',
-              text: 'Analiza este screenshot de una app de delivery o rideshare (Uber, DiDi, Rappi, InDriver, etc). Extrae SOLO estos datos en formato JSON: {"pago": número o null, "km": número o null, "minutos": número o null}. Si no encuentras algún dato ponlo en null. Solo responde el JSON, nada más.'
-            }
-          ]
-        }]
-      })
-    });
-
-    const data = await response.json();
-    const text = data.content[0].text.trim();
-    
-    // Parse JSON response
-    const parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
-
-    let filled = [];
-    if (parsed.pago !== null && parsed.pago > 0) {
-      document.getElementById('c-payment').value = parsed.pago;
-      filled.push('$' + parsed.pago);
-    }
-    if (parsed.km !== null && parsed.km > 0) {
-      document.getElementById('c-km').value = parsed.km;
-      filled.push(parsed.km + 'km');
-    }
-    if (parsed.minutos !== null && parsed.minutos > 0) {
-      document.getElementById('c-min').value = parsed.minutos;
-      filled.push(parsed.minutos + 'min');
-    }
-
-    if (filled.length > 0) {
-      statusEl.textContent = '✅ Detectado: ' + filled.join(' · ');
-      statusEl.style.color = 'var(--green)';
-      setTimeout(() => doCalculate(), 500);
-    } else {
-      statusEl.textContent = '⚠️ No se detectaron datos. Intenta con mejor imagen.';
-      statusEl.style.color = 'var(--yellow)';
-    }
-
-  } catch(e) {
-    console.error('Screenshot analysis error:', e);
-    statusEl.textContent = '❌ Error al analizar. Intenta de nuevo.';
-    statusEl.style.color = 'var(--red)';
-  }
-
-  // Reset input for next use
-  event.target.value = '';
 }
 
 // ── GPS Demand Detector ──
