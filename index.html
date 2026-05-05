@@ -1427,6 +1427,11 @@ body::before {
     <div class="screen" id="s-calc">
 
       <!-- Fuel vehicle header -->
+      <div style="display:flex;justify-content:flex-end;margin-bottom:6px">
+        <button onclick="goTo(4)" style="background:none;border:1px solid var(--border);border-radius:8px;padding:5px 12px;font-size:10px;font-family:'Inconsolata',monospace;color:var(--muted);cursor:pointer">
+          🔄 Cambiar app
+        </button>
+      </div>
       <div class="calc-header" id="fuel-header">
         <div>
           <div class="ch-badge">VEHÍCULO</div>
@@ -4538,7 +4543,7 @@ function toggleWakeWord() {
     btn.style.borderColor = wakeWordEnabled ? 'var(--accent)' : 'var(--border)';
     btn.style.color = wakeWordEnabled ? '#fff' : 'var(--muted)';
   }
-  // wake word disabled
+
 }
 
 // ── Theme System ──
