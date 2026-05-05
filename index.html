@@ -1550,7 +1550,7 @@ body::before {
             <div class="rv-num-val" id="rv-ph">$0/h</div>
           </div>
         </div>
-        <div class="rv-details">
+        <div class="rv-details" style="margin-top:10px">
           <div class="rv-detail" style="flex:1">
             <div class="rdl">PAGO POR KM</div>
             <div class="rdv" id="rv-pkm">$0/km</div>
@@ -2582,8 +2582,8 @@ function doCalculate() {
     // Regla secundaria: casi llega al piso y distancia corta
     if (profitPerHour >= efectiveMinimum * 0.9 && km <= 6) {
       score = 'yellow';
-    } else if (profitPerHour >= efectiveMinimum * 0.77 && km <= 10) {
-      score = 'yellow'; // Acepta si está cerca del mínimo con distancia razonable
+    } else if (profitPerHour >= efectiveMinimum * 0.75) {
+      score = 'yellow'; // Evalúa — cerca del mínimo, el conductor decide
     } else {
       score = 'red';
     }
@@ -3067,8 +3067,8 @@ function parseVoiceInput(text) {
     filled.push('$' + payment);
   }
   if (minutes !== null) {
-    const el = document.getElementById('c-min');
-    el.value = minutes; el.dispatchEvent(new Event('input', {bubbles:true}));
+    const elMin = document.getElementById('c-min');
+    if(elMin){elMin.value = minutes; elMin.dispatchEvent(new Event('input', {bubbles:true}));}
     filled.push(minutes + 'min');
   }
   if (km !== null) {
@@ -3081,7 +3081,7 @@ function parseVoiceInput(text) {
     showVoiceStatus('✓ ' + filled.join(' · '), '#12f579');
     setTimeout(() => {
       // Force trigger autoCalc on all fields
-      ['c-payment', 'c-km', 'c-min'].forEach(id => {
+      ['c-payment', 'c-km', 'c-min', 'c-minutes'].forEach(id => {
         const el = document.getElementById(id);
         if (el && el.value) el.dispatchEvent(new Event('input', {bubbles: true}));
       });
