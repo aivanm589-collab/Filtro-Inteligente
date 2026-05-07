@@ -4014,14 +4014,22 @@ function calculateCounterOffers(payment, km, minutes, costPerKm, minProfitPerHou
 }
 
 function showCounterOffers(payment, km, minutes) {
-  // InDriver and DiDi conductor always get counteroffer
   const isCounterPlatform = APP.platform === 'didi' || APP.platform === 'indriver';
   if (!isCounterPlatform) {
     document.getElementById('counteroffer-section').style.display = 'none';
     return;
   }
 
-  const { results, precioMinimo } = calculateCounterOffers(
+  const costoViaje = km * APP.costPerKm;
+  const basePh = ((payment - costoViaje) / minutes) * 60;
+
+  // If base payment already meets goal, hide counteroffer
+  if (basePh >= APP.minProfitPerHour) {
+    document.getElementById('counteroffer-section').style.display = 'none';
+    return;
+  }
+
+  const { precioMinimo, ganancia, ph } = calculateCounterOffers(
     payment, km, minutes, APP.costPerKm, APP.minProfitPerHour
   );
 
@@ -4029,51 +4037,23 @@ function showCounterOffers(payment, km, minutes) {
   const optionsEl = document.getElementById('counteroffer-options');
   const minEl = document.getElementById('counteroffer-minimum');
 
-  // Show counteroffer only if base price doesn't work
-  const baseOk = results[0].acepta;
-  if (baseOk) {
-    section.style.display = 'none';
-    return;
-  }
-
   section.style.display = 'block';
 
-  optionsEl.innerHTML = results.map((r, i) => {
-    const isBase = i === 0;
-    const color = r.acepta ? 'var(--green)' : 'var(--red)';
-    const icon = r.acepta ? '✅' : '❌';
-    const label = isBase ? 'Oferta base' : `Contraoferta $${r.precio}`;
-    return `
-      <div style="display:flex;justify-content:space-between;align-items:center;background:var(--surface);border-radius:10px;padding:10px 12px;border:1px solid ${r.acepta ? 'var(--green)' : 'var(--border)'}">
-        <div>
-          <div style="font-size:13px;font-weight:700;color:var(--text)">${icon} $${r.precio}</div>
-          <div style="font-size:10px;color:var(--muted);font-family:'Inconsolata',monospace">${label}</div>
-        </div>
-        <div style="text-align:right">
-          <div style="font-size:13px;font-weight:700;color:${color}">$${r.ph}/h</div>
-          <div style="font-size:10px;color:var(--muted);font-family:'Inconsolata',monospace">gan. $${r.ganancia}</div>
-        </div>
-      </div>`;
-  }).join('');
+  optionsEl.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;background:var(--surface);border-radius:10px;padding:14px 16px;border:2px solid var(--accent)">
+      <div>
+        <div style="font-size:22px;font-weight:900;color:var(--accent)">$${precioMinimo}</div>
+        <div style="font-size:10px;color:var(--muted);font-family:'Inconsolata',monospace">⭐ Contraoferta mínima</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:16px;font-weight:800;color:var(--green)">$${ph}/h</div>
+        <div style="font-size:10px;color:var(--muted);font-family:'Inconsolata',monospace">gan. $${ganancia}</div>
+      </div>
+    </div>`;
 
-  // Show minimum needed
-  const anyAccepted = results.some(r => r.acepta);
-  if (!anyAccepted) {
-    minEl.textContent = `$${precioMinimo} para alcanzar $${APP.minProfitPerHour}/h`;
-  } else {
-    minEl.style.display = 'none';
-    document.querySelector('#counteroffer-section .border-top').style.display = 'none';
-  }
+  if (minEl) minEl.style.display = 'none';
 }
 
-// ── DiDi Conductor Map Calculator ──
-let didiCMap = null;
-let didiCMarkerA = null;
-let didiCMarkerB = null;
-let didiCPointA = null;
-let didiCPointB = null;
-let didiCMapStep = 'A';
-let didiCRouteLine = null;
 
 function initDidiCMap() {
   if (didiCMap) return;
