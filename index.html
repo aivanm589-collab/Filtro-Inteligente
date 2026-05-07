@@ -2675,8 +2675,8 @@ function doCalculate() {
     }
   } catch(e) { console.log('Firebase error:', e); }
 
-  setScreen('s-result', 's-calc');
-  // Show counteroffer analysis for DiDi conductor
+  setScreen('s-result');
+  // Show counteroffer analysis for DiDi/InDriver
   showCounterOffers(effectivePayment, km, minutes);
   document.getElementById('bn-calc').classList.add('active');
 }
