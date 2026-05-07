@@ -4014,7 +4014,8 @@ function calculateCounterOffers(payment, km, minutes, costPerKm, minProfitPerHou
 }
 
 function showCounterOffers(payment, km, minutes) {
-  const isCounterPlatform = (APP.platform === 'didi' || APP.platform === 'indriver') && APP.userType === 'rideshare';
+  // InDriver and DiDi conductor always get counteroffer
+  const isCounterPlatform = APP.platform === 'didi' || APP.platform === 'indriver';
   if (!isCounterPlatform) {
     document.getElementById('counteroffer-section').style.display = 'none';
     return;
